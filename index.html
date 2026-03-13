@@ -877,8 +877,25 @@ body {
   .footer-cell { border-right: none; border-bottom: var(--border); }
   .footer-cell:last-child { border-bottom: none; }
 
-  .robot-header { flex-direction: column; gap: 10px; padding: 16px 14px; }
-  .robot-body { padding: 14px; gap: 16px; }
+  /* Robot result — mobile reflow */
+  .robot-header { display: flex; flex-direction: column; }
+  .robot-id-block { border-right: none; padding: 14px 16px; }
+  .robot-name { font-size: 1.8rem; }
+  .robot-tagline-block { border-top: var(--border-thin); padding: 12px 16px; }
+  .robot-class-block { border-left: none; border-top: var(--border-thin); align-items: flex-start; padding: 10px 16px; flex-direction: row; gap: 8px; align-items: center; }
+
+  .robot-body { grid-template-columns: 1fr; }
+  .robot-visual { border-right: none; border-bottom: var(--border); flex-direction: row; align-items: center; gap: 20px; padding: 16px 20px; }
+  .robot-svg-container { width: 140px; height: 240px; margin-top: 0; flex-shrink: 0; }
+  .robot-stats-mini { flex: 1; }
+
+  .robot-details { overflow: hidden; }
+  .detail-section { padding: 12px 16px; }
+
+  /* MBTI quiz link — wrap on narrow screens */
+  .mbti-label-row { flex-wrap: wrap; gap: 4px; }
+  .mbti-quiz-trigger { white-space: normal; text-align: left; }
+
   .robot-stats { grid-template-columns: 1fr; }
 }
 
