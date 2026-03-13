@@ -1,0 +1,2514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNIT-YOU — Personal Robot Generator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500&family=Inter+Tight:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+<style>
+:root {
+  --paper: #FDFBF7;
+  --ink: #284BAC;
+  --ink-light: rgba(40, 75, 172, 0.09);
+  --ink-medium: rgba(40, 75, 172, 0.35);
+  --accent: #284BAC;
+  --accent-light: rgba(40, 75, 172, 0.07);
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-mono: 'Space Mono', monospace;
+  --font-sans: 'Inter', sans-serif;
+  --font-tight: 'Inter Tight', 'Inter', sans-serif;
+  --border: 1px solid var(--ink);
+  --border-thin: 0.5px solid var(--ink-medium);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+::-webkit-scrollbar { width: 3px; height: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #284BAC; border-radius: 0 !important; border: none; }
+* { scrollbar-width: thin; scrollbar-color: #284BAC transparent; }
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+
+
+/* ── HEADER ── */
+.header {
+  border-bottom: var(--border);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: stretch;
+  position: relative;
+  z-index: 10;
+}
+.header-left {
+  padding: 10px 16px;
+  display: flex; flex-direction: column; justify-content: center; gap: 2px;
+}
+.header-label {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.5;
+}
+.header-value {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.1rem;
+}
+.header-center {
+  padding: 12px 32px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.logo {
+  font-family: var(--font-mono);
+  font-size: 1.9rem; font-weight: 700;
+  letter-spacing: -0.02em; line-height: 1;
+}
+.logo-sub {
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.45;
+}
+.header-right {
+  padding: 10px 16px;
+  display: flex; flex-direction: row; justify-content: flex-end; align-items: center; gap: 14px;
+  position: relative;
+}
+.header-right-status { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+.settings-btn {
+  background: none; border: 1px solid var(--ink-medium); cursor: pointer;
+  color: var(--ink); opacity: 0.5; padding: 4px 6px; line-height: 1;
+  font-size: 0.85rem; transition: opacity 0.15s, border-color 0.15s;
+}
+.settings-btn:hover { opacity: 1; border-color: var(--ink); }
+.settings-popover {
+  display: none; position: absolute; top: calc(100% + 1px); right: 0;
+  background: var(--paper); border: var(--border); z-index: 300;
+  padding: 14px 16px; width: 280px; flex-direction: column; gap: 8px;
+}
+.settings-popover.open { display: flex; }
+.settings-popover-label {
+  font-family: var(--font-mono); font-size: 0.58rem;
+  letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.55;
+}
+.settings-popover-input {
+  background: transparent; border: 1px solid var(--ink-medium);
+  color: var(--ink); font-family: var(--font-mono); font-size: 0.75rem;
+  padding: 6px 10px; outline: none; width: 100%;
+  transition: border-color 0.2s;
+}
+.settings-popover-input:focus { border-color: var(--ink); }
+.settings-popover-input::placeholder { opacity: 0.35; font-style: italic; }
+.settings-popover-hint {
+  font-family: var(--font-mono); font-size: 0.55rem;
+  letter-spacing: 0.05em; opacity: 0.4;
+}
+
+/* ── LAYOUT ── */
+.main {
+  display: grid;
+  grid-template-columns: 580px 1fr;
+  min-height: calc(100vh - 65px);
+  position: relative;
+  z-index: 20;
+}
+
+/* ── FORM PANEL ── */
+.form-panel {
+  border-right: var(--border);
+  display: flex;
+  flex-direction: column;
+}
+.form-section { border-bottom: var(--border); }
+.section-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  padding: 9px 20px;
+  background: var(--ink-light);
+}
+.section-title { font-family: var(--font-serif); font-style: italic; font-size: 1.15rem; }
+.section-num { font-family: var(--font-mono); font-size: 0.6rem; opacity: 0.4; letter-spacing: 0.1em; }
+.section-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 12px; }
+
+.field { display: flex; flex-direction: column; gap: 5px; }
+.field label {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.55;
+}
+.field input, .field textarea {
+  background: transparent;
+  border: 1px solid var(--ink-medium);
+  color: var(--ink);
+  font-family: var(--font-tight);
+  font-size: 0.78rem;
+  font-weight: 400;
+  padding: 7px 10px;
+  width: 100%;
+  outline: none;
+  transition: border-color 0.2s, background 0.2s;
+  resize: none;
+}
+.field input:focus, .field textarea:focus {
+  border-color: var(--ink);
+  background: var(--ink-light);
+}
+.field input::placeholder, .field textarea::placeholder {
+  color: var(--ink);
+  opacity: 0.35;
+  font-style: italic;
+}
+.field input:-webkit-autofill,
+.field input:-webkit-autofill:hover,
+.field input:-webkit-autofill:focus { -webkit-text-fill-color: var(--ink); }
+
+/* ── Custom dropdown ── */
+.custom-select { position: relative; width: 100%; }
+.custom-select-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px;
+  border: 1px solid var(--ink-medium);
+  background: transparent;
+  color: var(--ink);
+  font-family: var(--font-tight);
+  font-size: 0.78rem;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color 0.2s, background 0.2s;
+  gap: 8px;
+}
+.custom-select-trigger:hover { border-color: var(--ink); background: var(--ink-light); }
+.custom-select-trigger.open { border-color: var(--ink); background: var(--ink-light); }
+.custom-select-trigger.placeholder { opacity: 0.38; font-style: italic; }
+.custom-select-trigger.placeholder.has-value { opacity: 1; font-style: normal; }
+.custom-select-arrow {
+  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
+  opacity: 0.5;
+  transition: transform 0.15s;
+}
+.custom-select-trigger.open .custom-select-arrow { transform: rotate(180deg); }
+.custom-select-dropdown {
+  position: absolute;
+  top: calc(100% + 2px);
+  bottom: auto;
+  left: 0; right: 0;
+  background: var(--paper);
+  border: 1px solid var(--ink);
+  z-index: 200;
+  display: none;
+  flex-direction: column;
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #284BAC transparent;
+}
+.custom-select-dropdown::-webkit-scrollbar {
+  width: 2px;
+}
+.custom-select-dropdown::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-select-dropdown::-webkit-scrollbar-thumb {
+  background: #284BAC;
+  border-radius: 0 !important;
+  border: none;
+}
+.custom-select-dropdown.open { display: flex; }
+.custom-select-dropdown.flip-up { top: auto; bottom: calc(100% + 2px); }
+.custom-select-option {
+  padding: 7px 10px;
+  font-family: var(--font-tight);
+  font-size: 0.78rem;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--ink-light);
+}
+.custom-select-option:last-child { border-bottom: none; }
+.custom-select-option:hover { background: var(--ink-light); }
+.custom-select-option.selected { background: var(--ink); color: var(--paper); }
+
+/* MBTI label row */
+.mbti-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.mbti-quiz-trigger {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink);
+  opacity: 0.55;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: opacity 0.15s;
+}
+.mbti-quiz-trigger:hover { opacity: 1; }
+
+/* MBTI result badge */
+.mbti-result-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border: var(--border-thin);
+  border-color: var(--ink-medium);
+  background: var(--ink-light);
+  margin-top: 2px;
+}
+.badge-type {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+.badge-desc {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  opacity: 0.7;
+  line-height: 1.3;
+}
+.badge-redo {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.55rem;
+  color: var(--ink-medium);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.badge-redo:hover { color: var(--ink); }
+
+/* Suggest pills */
+.suggest-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.suggest-pill {
+  font-family: var(--font-tight);
+  font-size: 0.76rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  padding: 5px 11px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+  background: rgba(40, 75, 172, 0.09);
+  color: var(--ink);
+  opacity: 0.75;
+  white-space: normal;
+  line-height: 1.35;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.suggest-pill:hover { background: rgba(40, 75, 172, 0.16); color: var(--ink); opacity: 1; }
+.pill-emoji { flex-shrink: 0; }
+.pill-text { flex: 1; }
+.suggest-pill.used { background: var(--accent); color: var(--paper); opacity: 1; pointer-events: none; font-weight: 400; }
+
+/* Chips */
+.chip-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip {
+  font-family: var(--font-tight);
+  font-size: 0.76rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  padding: 5px 11px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+  background: rgba(40, 75, 172, 0.09);
+  color: var(--ink);
+  opacity: 0.75;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.35;
+}
+.chip:hover { background: rgba(40, 75, 172, 0.16); color: var(--ink); opacity: 1; }
+.chip.active { background: var(--accent); color: var(--paper); opacity: 1; font-weight: 400; }
+
+/* API key row */
+.api-key-row {
+  padding: 10px 16px 0;
+  display: flex; flex-direction: column; gap: 5px;
+}
+.api-key-label {
+  font-family: var(--font-mono); font-size: 0.58rem;
+  letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.55;
+}
+.api-key-input {
+  background: transparent; border: 1px solid var(--ink-medium);
+  color: var(--ink); font-family: var(--font-mono); font-size: 0.75rem;
+  padding: 7px 10px; outline: none; width: 100%;
+  transition: border-color 0.2s, background 0.2s;
+}
+.api-key-input:focus { border-color: var(--ink); background: var(--ink-light); }
+.api-key-input::placeholder { opacity: 0.35; font-style: italic; }
+
+/* Generate button */
+.generate-btn {
+  margin: 16px;
+  padding: 14px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.3rem;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.generate-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: #1e40af;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.generate-btn:hover:not(:disabled)::after { transform: scaleX(1); }
+.generate-btn span { position: relative; z-index: 1; }
+.generate-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ── OUTPUT PANEL ── */
+.output-panel { position: relative; display: flex; flex-direction: column; }
+.empty-state {
+  flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; padding: 40px; color: #284BAC;
+  background-image: radial-gradient(circle, rgba(40,75,172,0.07) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+.empty-robot-wrap { position: relative; display: flex; align-items: center; justify-content: center; }
+.empty-robot-svg {
+  width: 300px; height: auto;
+  animation: robotFloat 4s ease-in-out infinite;
+  opacity: 0.9;
+}
+.scan-line {
+  position: absolute; left: -30px; right: -30px; height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(40,75,172,0.6) 30%, rgba(40,75,172,0.9) 50%, rgba(40,75,172,0.6) 70%, transparent 100%);
+  animation: scanDown 3s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes robotFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+@keyframes scanDown {
+  0%   { top: 0%; opacity: 0; }
+  5%   { opacity: 1; }
+  95%  { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.empty-text { font-family: var(--font-serif); font-style: italic; font-size: 3.2rem; text-align: center; line-height: 1.2; }
+.empty-sub { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; text-align: center; opacity: 0.5; }
+.empty-status {
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.45;
+}
+.status-dot {
+  width: 5px; height: 5px; border-radius: 50%; background: #284BAC;
+  animation: statusPulse 2s ease-in-out infinite;
+}
+@keyframes statusPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(0.7); }
+}
+
+.result-area { display: none; flex-direction: column; flex: 1; }
+.result-area.visible { display: flex; }
+
+.robot-header {
+  border-bottom: var(--border);
+  display: grid;
+  grid-template-columns: 260px 1fr auto;
+  align-items: stretch;
+}
+.robot-id-block { border-right: var(--border); padding: 16px 20px; display: flex; flex-direction: column; gap: 4px; }
+.robot-designation { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.5; }
+.robot-name { font-family: var(--font-serif); font-size: 2.2rem; font-weight: 600; line-height: 1; letter-spacing: -0.02em; }
+.robot-model { font-family: var(--font-mono); font-size: 0.7rem; opacity: 0.6; }
+.robot-tagline-block { padding: 16px 24px; display: flex; align-items: center; }
+.robot-tagline { font-family: var(--font-serif); font-style: italic; font-size: 1.15rem; line-height: 1.45; max-width: 400px; }
+.robot-class-block { border-left: var(--border); padding: 16px 20px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 4px; }
+.robot-class-label { font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.45; }
+.robot-class-value { font-family: var(--font-serif); font-size: 1.1rem; font-style: italic; }
+.status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #16a34a; margin-right: 5px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+.robot-body { display: grid; grid-template-columns: 260px 1fr; flex: 1; }
+.robot-visual { border-right: var(--border); padding: 24px; display: flex; flex-direction: column; align-items: center; gap: 16px; background: var(--ink-light); }
+.robot-svg-container { width: 220px; height: 380px; position: relative; margin-top: 20px; }
+.robot-svg-container svg { width: 100%; height: 100%; }
+
+.robot-stats-mini { width: 100%; display: flex; flex-direction: column; gap: 8px; }
+.stat-bar-row { display: flex; flex-direction: column; gap: 3px; }
+.stat-bar-label { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.6; }
+.stat-bar-track { height: 3px; background: var(--ink-light); border: var(--border-thin); overflow: hidden; }
+.stat-bar-fill { height: 100%; background: var(--ink); transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1); }
+
+.robot-details { padding: 0; display: flex; flex-direction: column; }
+.detail-section { border-bottom: var(--border-thin); padding: 14px 20px; }
+.detail-section:last-child { border-bottom: none; }
+.detail-label { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0.45; margin-bottom: 6px; }
+.detail-content { font-family: var(--font-serif); font-size: 1rem; line-height: 1.55; }
+.quirk-list { list-style: none; display: flex; flex-direction: column; gap: 5px; }
+.quirk-list li { font-family: var(--font-serif); font-size: 0.95rem; line-height: 1.4; padding-left: 16px; position: relative; }
+.quirk-list li::before { content: '—'; position: absolute; left: 0; opacity: 0.4; font-family: var(--font-mono); }
+.tag-row { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; padding: 4px 10px; border: var(--border-thin); text-transform: uppercase; }
+.tag.accent { border-color: var(--ink); color: var(--ink); }
+.protocol-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.protocol-item { border: var(--border-thin); padding: 10px 12px; display: flex; flex-direction: column; gap: 3px; }
+.protocol-name { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.5; }
+.protocol-value { font-family: var(--font-serif); font-style: italic; font-size: 0.92rem; line-height: 1.3; }
+
+/* ── LOADING ── */
+.loading-overlay {
+  display: none; position: absolute; inset: 0;
+  background: rgba(253,251,247,0.92); z-index: 100;
+  flex-direction: column; align-items: center; justify-content: center; gap: 20px;
+}
+.loading-overlay.visible { display: flex; }
+.loading-label { font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.6; }
+.loading-progress { width: 200px; height: 1px; background: var(--ink-light); position: relative; overflow: hidden; }
+.loading-bar { position: absolute; left: -60%; top: 0; bottom: 0; width: 60%; background: var(--ink); animation: loading-sweep 1.2s ease-in-out infinite; }
+@keyframes loading-sweep { 0% { left: -60%; } 100% { left: 100%; } }
+.loading-steps { display: flex; flex-direction: column; gap: 4px; align-items: center; }
+.loading-step { font-family: var(--font-serif); font-style: italic; font-size: 1rem; opacity: 0; transition: opacity 0.3s; }
+.loading-step.active { opacity: 1; }
+
+/* ── MBTI QUIZ MODAL ── */
+.quiz-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(26, 47, 107, 0.18);
+  backdrop-filter: blur(2px);
+  z-index: 200;
+  align-items: center;
+  justify-content: center;
+}
+.quiz-backdrop.open { display: flex; }
+
+.quiz-modal {
+  background: var(--paper);
+  border: var(--border);
+  width: 480px;
+  max-width: 95vw;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  animation: modalIn 0.25s ease forwards;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.quiz-header {
+  border-bottom: var(--border);
+  padding: 14px 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--ink-light);
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+.quiz-title { font-family: var(--font-serif); font-style: italic; font-size: 1.25rem; }
+.quiz-close {
+  background: none; border: none; cursor: pointer;
+  font-family: var(--font-mono); font-size: 0.7rem;
+  color: var(--ink); opacity: 0.5; letter-spacing: 0.1em;
+  transition: opacity 0.15s;
+}
+.quiz-close:hover { opacity: 1; }
+
+.quiz-progress-bar {
+  height: 2px;
+  background: var(--ink-light);
+  position: relative;
+}
+.quiz-progress-fill {
+  height: 100%;
+  background: var(--ink);
+  transition: width 0.35s ease;
+}
+
+.quiz-body { padding: 22px 18px; }
+
+.quiz-step { display: none; }
+.quiz-step.active { display: block; }
+
+.quiz-q-meta {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.45;
+  margin-bottom: 8px;
+}
+.quiz-q-axis {
+  display: inline-block;
+  padding: 2px 7px;
+  border: var(--border-thin);
+  margin-left: 6px;
+  font-style: normal;
+}
+.quiz-question {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  line-height: 1.45;
+  margin-bottom: 20px;
+}
+
+.quiz-options { display: flex; flex-direction: column; gap: 8px; }
+.quiz-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border: var(--border-thin);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.quiz-option:hover { border-color: var(--ink); background: var(--ink-light); }
+.quiz-option.selected { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.option-letter {
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  opacity: 0.5;
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+.quiz-option.selected .option-letter { opacity: 0.7; color: var(--paper); }
+.option-text {
+  font-family: var(--font-serif);
+  font-size: 1rem;
+  line-height: 1.4;
+}
+
+.quiz-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 22px;
+  padding-top: 14px;
+  border-top: var(--border-thin);
+}
+.quiz-counter {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  opacity: 0.4;
+}
+.quiz-btn {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1rem;
+  padding: 8px 20px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+.quiz-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+.quiz-btn:not(:disabled):hover { opacity: 0.8; }
+
+/* Quiz result screen */
+.quiz-result { display: none; padding: 28px 18px; text-align: center; }
+.quiz-result.active { display: block; }
+.result-type-label { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; opacity: 0.45; margin-bottom: 8px; }
+.result-type { font-family: var(--font-serif); font-size: 3.5rem; font-weight: 600; letter-spacing: 0.05em; line-height: 1; color: var(--ink); margin-bottom: 8px; }
+.result-nickname { font-family: var(--font-serif); font-style: italic; font-size: 1.2rem; opacity: 0.7; margin-bottom: 14px; }
+.result-blurb { font-family: var(--font-serif); font-size: 0.95rem; line-height: 1.55; opacity: 0.8; margin-bottom: 24px; max-width: 340px; margin-left: auto; margin-right: auto; }
+.result-axes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+.result-axis-item {
+  border: var(--border-thin);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.result-axis-name { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.45; }
+.result-axis-bar { height: 3px; background: var(--ink-light); margin-top: 3px; }
+.result-axis-fill { height: 100%; background: var(--ink); }
+.result-axis-val { font-family: var(--font-serif); font-size: 0.9rem; }
+.quiz-apply-btn {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.15rem;
+  padding: 12px 32px;
+  background: var(--ink);
+  color: var(--paper);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s;
+}
+.quiz-apply-btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--ink-medium);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.quiz-apply-btn:hover::after { transform: scaleX(1); }
+.quiz-apply-btn span { position: relative; z-index: 1; }
+
+/* ── FOOTER ── */
+.footer { border-top: var(--border); display: grid; grid-template-columns: 1fr 1fr 1fr; position: relative; z-index: 10; }
+.footer-cell { border-right: var(--border); padding: 7px 14px; display: flex; justify-content: space-between; align-items: center; }
+.footer-cell:last-child { border-right: none; }
+.footer-label { font-family: var(--font-serif); font-style: italic; font-size: 0.9rem; }
+.footer-val { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.08em; opacity: 0.5; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.result-area.visible .robot-header,
+.result-area.visible .robot-body {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+/* ── WIDE SCREENS ── */
+@media (min-width: 1300px) { .main { grid-template-columns: 660px 1fr; } }
+@media (min-width: 1600px) { .main { grid-template-columns: 740px 1fr; } }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 860px) {
+  .main { grid-template-columns: 1fr; min-height: unset; }
+  .form-panel { border-right: none; border-bottom: var(--border); }
+  .output-panel { min-height: 60vh; }
+}
+
+@media (max-width: 600px) {
+  .header { grid-template-columns: 1fr; }
+  .header-left, .header-right { display: none; }
+  .header-center { padding: 10px 16px; border: none; }
+  .logo { font-size: 1.5rem; }
+  .logo-sub { font-size: 0.5rem; }
+
+  .main { grid-template-columns: 1fr; }
+  .form-panel { border-right: none; border-bottom: var(--border); }
+
+  .section-body { padding: 12px 14px; gap: 10px; }
+  .section-header { padding: 7px 14px; }
+
+  .chip-grid { gap: 5px; }
+  .chip { font-size: 0.72rem; padding: 5px 9px; }
+  .suggest-row { gap: 5px; }
+  .suggest-pill { font-size: 0.72rem; padding: 5px 9px; }
+
+  .generate-btn { margin: 12px; font-size: 1.1rem; }
+
+  .footer { grid-template-columns: 1fr; }
+  .footer-cell { border-right: none; border-bottom: var(--border); }
+  .footer-cell:last-child { border-bottom: none; }
+
+  .robot-header { flex-direction: column; gap: 10px; padding: 16px 14px; }
+  .robot-body { padding: 14px; gap: 16px; }
+  .robot-stats { grid-template-columns: 1fr; }
+}
+
+/* ── BOOT OVERLAY ── */
+.boot-overlay {
+  position: fixed; inset: 0;
+  background: var(--paper);
+  z-index: 99999;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 28px;
+}
+.boot-overlay.exit {
+  animation: bootExit 0.7s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+}
+@keyframes bootExit {
+  0%   { clip-path: inset(0 0 0 0); }
+  100% { clip-path: inset(0 0 100% 0); }
+}
+.boot-logo-wrap { text-align: center; opacity: 0; animation: bootFadeIn 0.4s ease 0.1s forwards; }
+.boot-logo-main {
+  font-family: var(--font-mono); font-size: 3rem; font-weight: 700;
+  color: var(--ink); letter-spacing: -0.02em; line-height: 1;
+}
+.boot-logo-sub {
+  font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: var(--ink); opacity: 0.4; margin-top: 4px;
+}
+.boot-log {
+  width: min(420px, 90vw);
+  border: var(--border-thin);
+  padding: 14px 16px;
+  font-family: var(--font-mono); font-size: 0.65rem; letter-spacing: 0.08em;
+  color: var(--ink); line-height: 2;
+  opacity: 0; animation: bootFadeIn 0.3s ease 0.5s forwards;
+  min-height: 110px;
+}
+.boot-log-line { display: flex; gap: 10px; align-items: baseline; }
+.boot-log-line .bl-label { opacity: 0.35; flex-shrink: 0; }
+.boot-log-line .bl-text { text-transform: uppercase; letter-spacing: 0.1em; }
+.boot-log-line .bl-ok { color: var(--ink); opacity: 0.5; flex-shrink: 0; }
+.boot-log-line.pending .bl-text::after { content: '▋'; animation: blink 0.8s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.boot-bar-wrap {
+  width: min(420px, 90vw);
+  opacity: 0; animation: bootFadeIn 0.3s ease 0.5s forwards;
+}
+.boot-bar-label {
+  font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.14em;
+  text-transform: uppercase; opacity: 0.35; color: var(--ink); margin-bottom: 6px;
+  display: flex; justify-content: space-between;
+}
+.boot-bar-track {
+  height: 1px; background: var(--ink-medium); position: relative;
+}
+.boot-bar-fill {
+  position: absolute; left: 0; top: 0; bottom: 0;
+  background: var(--ink); width: 0%;
+  transition: width 0.25s ease;
+}
+@keyframes bootFadeIn { to { opacity: 1; } }
+
+/* ── INTRO STAGGER ── */
+.header, .main, .footer { opacity: 0; }
+.header.intro-done  { animation: introDown 0.5s ease forwards; }
+.main.intro-done    { animation: introUp 0.55s ease 0.08s forwards; }
+.footer.intro-done  { animation: introUp 0.4s ease 0.14s forwards; }
+@keyframes introDown {
+  from { opacity: 0; transform: translateY(-12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes introUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<!-- BOOT OVERLAY -->
+<div class="boot-overlay" id="boot-overlay">
+  <div class="boot-logo-wrap">
+    <div class="boot-logo-main">UNIT-YOU</div>
+    <div class="boot-logo-sub">Personal Robot Generator — v2.4.1</div>
+  </div>
+  <div class="boot-log" id="boot-log"></div>
+  <div class="boot-bar-wrap">
+    <div class="boot-bar-label">
+      <span>System initialisation</span>
+      <span id="boot-pct">0%</span>
+    </div>
+    <div class="boot-bar-track"><div class="boot-bar-fill" id="boot-bar"></div></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="header-left">
+    <span class="header-label">System</span>
+    <span class="header-value">Personality-to-Hardware Compiler</span>
+  </div>
+  <div class="header-center">
+    <span class="logo">UNIT-YOU</span>
+    <span class="logo-sub">Personal Robot Generator — v2.4.1</span>
+  </div>
+  <div class="header-right">
+    <div class="header-right-status">
+      <span class="header-label">Status</span>
+      <span class="header-value"><span class="status-dot"></span>Online</span>
+    </div>
+  </div>
+</header>
+
+<!-- MBTI QUIZ MODAL -->
+<div class="quiz-backdrop" id="quiz-backdrop">
+  <div class="quiz-modal">
+    <div class="quiz-header">
+      <span class="quiz-title">Quick MBTI Detector</span>
+      <button class="quiz-close" onclick="closeQuiz()">[ close ]</button>
+    </div>
+    <div class="quiz-progress-bar">
+      <div class="quiz-progress-fill" id="quiz-progress" style="width:0%"></div>
+    </div>
+
+    <div class="quiz-body" id="quiz-body">
+      <!-- Steps injected by JS -->
+    </div>
+
+    <!-- Result screen -->
+    <div class="quiz-result" id="quiz-result">
+      <div class="result-type-label">Your Type is</div>
+      <div class="result-type" id="result-type-display">INTJ</div>
+      <div class="result-nickname" id="result-nickname">The Architect</div>
+      <p class="result-blurb" id="result-blurb"></p>
+      <div class="result-axes" id="result-axes"></div>
+      <button class="quiz-apply-btn" onclick="applyMbtiResult()">
+        <span>⟶ Apply to my robot</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- FORM PANEL -->
+  <aside class="form-panel">
+
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-title">Identity Matrix</span>
+        <span class="section-num">01 / 04</span>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Your Name</label>
+          <input type="text" id="name" placeholder="Alex" />
+        </div>
+        <div class="field">
+          <label>Zodiac Sign</label>
+          <div class="custom-select" id="zodiac-select">
+            <div class="custom-select-trigger placeholder" onclick="toggleDropdown('zodiac-select')">
+              <span class="custom-select-label">Select</span>
+              <svg class="custom-select-arrow" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,3 5,7 8,3"/></svg>
+            </div>
+            <div class="custom-select-dropdown" id="zodiac-select-dd">
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Aries')">Aries</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Taurus')">Taurus</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Gemini')">Gemini</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Cancer')">Cancer</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Leo')">Leo</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Virgo')">Virgo</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Libra')">Libra</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Scorpio')">Scorpio</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Sagittarius')">Sagittarius</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Capricorn')">Capricorn</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Aquarius')">Aquarius</div>
+              <div class="custom-select-option" onclick="pickOption('zodiac-select','Pisces')">Pisces</div>
+            </div>
+          </div>
+        </div>
+        <div class="field">
+          <div class="mbti-label-row">
+            <label>MBTI Type</label>
+            <button class="mbti-quiz-trigger" onclick="openMbtiQuiz()">Don't know yours? → Take the quiz</button>
+          </div>
+          <div class="custom-select" id="mbti-select">
+            <div class="custom-select-trigger placeholder" onclick="toggleDropdown('mbti-select')">
+              <span class="custom-select-label">Select</span>
+              <svg class="custom-select-arrow" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,3 5,7 8,3"/></svg>
+            </div>
+            <div class="custom-select-dropdown" id="mbti-select-dd">
+              <div class="custom-select-option" onclick="pickOption('mbti-select','INTJ')">INTJ — The Architect</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','INTP')">INTP — The Thinker</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ENTJ')">ENTJ — The Commander</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ENTP')">ENTP — The Debater</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','INFJ')">INFJ — The Advocate</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','INFP')">INFP — The Mediator</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ENFJ')">ENFJ — The Protagonist</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ENFP')">ENFP — The Campaigner</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ISTJ')">ISTJ — The Logistician</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ISFJ')">ISFJ — The Defender</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ESTJ')">ESTJ — The Executive</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ESFJ')">ESFJ — The Consul</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ISTP')">ISTP — The Virtuoso</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ISFP')">ISFP — The Adventurer</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ESTP')">ESTP — The Entrepreneur</div>
+              <div class="custom-select-option" onclick="pickOption('mbti-select','ESFP')">ESFP — The Entertainer</div>
+            </div>
+          </div>
+          <div id="mbti-result-badge" class="mbti-result-badge" style="display:none">
+            <span class="badge-type" id="badge-type-val"></span>
+            <span class="badge-desc" id="badge-type-desc"></span>
+            <span class="badge-redo" onclick="openMbtiQuiz()">retake →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-title">Life Parameters</span>
+        <span class="section-num">02 / 04</span>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Top 3 Life Goals (comma separated)</label>
+          <textarea id="goals" rows="2" placeholder="Start a business, travel the world, find true love"></textarea>
+          <div class="suggest-row">
+            <span class="suggest-pill" data-target="goals" data-val="build something that outlasts me, find deep love, travel every continent">🌍 Explorer</span>
+            <span class="suggest-pill" data-target="goals" data-val="start a company, become financially free, mentor others">💼 Founder</span>
+            <span class="suggest-pill" data-target="goals" data-val="master a craft, create meaningful art, leave a legacy">🎨 Artist</span>
+            <span class="suggest-pill" data-target="goals" data-val="raise a family, live simply, find inner peace">🌿 Grounded</span>
+            <span class="suggest-pill" data-target="goals" data-val="gain power, dominate my field, never be ignored">⚡ Ambitious</span>
+            <span class="suggest-pill" data-target="goals" data-val="understand the universe, solve a hard problem, publish research">🔬 Intellectual</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Biggest Fear</label>
+          <input type="text" id="fear" placeholder="Being forgotten" />
+          <div class="suggest-row">
+            <span class="suggest-pill" data-target="fear" data-val="being forgotten">Forgotten</span>
+            <span class="suggest-pill" data-target="fear" data-val="ending up alone">Alone</span>
+            <span class="suggest-pill" data-target="fear" data-val="losing control">Losing control</span>
+            <span class="suggest-pill" data-target="fear" data-val="not being good enough">Not enough</span>
+            <span class="suggest-pill" data-target="fear" data-val="mediocrity">Mediocrity</span>
+            <span class="suggest-pill" data-target="fear" data-val="being abandoned">Abandoned</span>
+            <span class="suggest-pill" data-target="fear" data-val="failing after trying everything">Failing anyway</span>
+            <span class="suggest-pill" data-target="fear" data-val="dying without purpose">No purpose</span>
+            <span class="suggest-pill" data-target="fear" data-val="being exposed as a fraud">Impostor</span>
+            <span class="suggest-pill" data-target="fear" data-val="losing my mind">Losing my mind</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>A Controversial Opinion You Hold</label>
+          <textarea id="opinion" rows="2" placeholder="Pineapple belongs on pizza"></textarea>
+          <div class="suggest-row">
+            <span class="suggest-pill" data-target="opinion" data-val="pineapple belongs on pizza and haters are wrong">🍕 Pineapple Is Fine</span>
+            <span class="suggest-pill" data-target="opinion" data-val="college is an overpriced social ritual, not education">🎓 College Is A Scam</span>
+            <span class="suggest-pill" data-target="opinion" data-val="most people are not actually listening — they are rehearsing their reply">🗣 Nobody Listens</span>
+            <span class="suggest-pill" data-target="opinion" data-val="social media is making society measurably dumber and angrier">📵 Social Media Is Poison</span>
+            <span class="suggest-pill" data-target="opinion" data-val="most people deep down want someone to tell them what to do">🧠 People Want Control</span>
+            <span class="suggest-pill" data-target="opinion" data-val="remote work is superior and offices exist to justify managers">🏠 Offices Are Theatre</span>
+            <span class="suggest-pill" data-target="opinion" data-val="intelligence is mostly luck of birth, not personal achievement">🎲 IQ Is Just Luck</span>
+            <span class="suggest-pill" data-target="opinion" data-val="romantic love is mostly a chemical addiction people romanticize">💊 Love Is Just Chemistry</span>
+            <span class="suggest-pill" data-target="opinion" data-val="most people would rather feel righteous than be correct">⚖️ Feeling Right Beats Being Right</span>
+            <span class="suggest-pill" data-target="opinion" data-val="childhood trauma explains most adult personality traits — therapy changes less than people think">🛋️ Therapy Is Overrated</span>
+            <span class="suggest-pill" data-target="opinion" data-val="money genuinely does buy happiness, just no one admits it">💰 Money Buys Happiness</span>
+            <span class="suggest-pill" data-target="opinion" data-val="most friendships are transactional and expire when circumstances change">🤝 Friendships Are Contracts</span>
+            <span class="suggest-pill" data-target="opinion" data-val="privacy is already dead and people who think otherwise are delusional">👁 Privacy Is An Illusion</span>
+            <span class="suggest-pill" data-target="opinion" data-val="free will is mostly a story we tell after the fact">🎭 Free Will Is Fiction</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-title">Use Case Directive</span>
+        <span class="section-num">03 / 04</span>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Primary Use (pick up to 2)</label>
+          <div class="chip-grid" id="use-chips">
+            <span class="chip" data-val="Productivity">Productivity</span>
+            <span class="chip" data-val="Emotional Support">Emotional Support</span>
+            <span class="chip" data-val="Creative Partner">Creative Partner</span>
+            <span class="chip" data-val="Security">Security</span>
+            <span class="chip" data-val="Life Coach">Life Coach</span>
+            <span class="chip" data-val="Party Companion">Party Companion</span>
+            <span class="chip" data-val="Research">Research</span>
+            <span class="chip" data-val="Chaos Agent">Chaos Agent</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <div class="section-header">
+        <span class="section-title">Aesthetic Calibration</span>
+        <span class="section-num">04 / 04</span>
+      </div>
+      <div class="section-body">
+        <div class="field">
+          <label>Robot Vibe</label>
+          <div class="chip-grid" id="vibe-chips">
+            <span class="chip" data-val="Sleek & Minimal">Sleek & Minimal</span>
+            <span class="chip" data-val="Chunky & Retro">Chunky & Retro</span>
+            <span class="chip" data-val="Organic & Fluid">Organic & Fluid</span>
+            <span class="chip" data-val="Military Grade">Military Grade</span>
+            <span class="chip" data-val="Cute & Round">Cute & Round</span>
+            <span class="chip" data-val="Gothic Industrial">Gothic Industrial</span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Energy Source</label>
+          <div class="custom-select" id="energy-select">
+            <div class="custom-select-trigger placeholder" onclick="toggleDropdown('energy-select')">
+              <span class="custom-select-label">Select</span>
+              <svg class="custom-select-arrow" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="2,3 5,7 8,3"/></svg>
+            </div>
+            <div class="custom-select-dropdown" id="energy-select-dd">
+              <div class="custom-select-option" onclick="pickOption('energy-select','Solar')">Solar</div>
+              <div class="custom-select-option" onclick="pickOption('energy-select','Plasma Core')">Plasma Core</div>
+              <div class="custom-select-option" onclick="pickOption('energy-select','Caffeine Conversion')">Caffeine Conversion</div>
+              <div class="custom-select-option" onclick="pickOption('energy-select','Emotional Resonance')">Emotional Resonance</div>
+              <div class="custom-select-option" onclick="pickOption('energy-select','Dark Matter')">Dark Matter</div>
+              <div class="custom-select-option" onclick="pickOption('energy-select','Vibes Only')">Vibes Only</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <button class="generate-btn" id="generate-btn" onclick="generateRobot()" disabled>
+      <span>⟶ Synthesize My Robot</span>
+    </button>
+
+  </aside>
+
+  <!-- OUTPUT PANEL -->
+  <div class="output-panel">
+
+    <div class="empty-state" id="empty-state">
+      <div class="empty-robot-wrap">
+      <div class="scan-line"></div>
+      <svg viewBox="0 0 260 390" xmlns="http://www.w3.org/2000/svg" class="empty-robot-svg">
+        <!-- Antenna -->
+        <line x1="130" y1="20" x2="125" y2="4" stroke="#284BAC" stroke-width="1.5"/>
+        <line x1="130" y1="20" x2="135" y2="4" stroke="#284BAC" stroke-width="1.5"/>
+        <circle cx="125" cy="4" r="4" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.4"/>
+        <circle cx="135" cy="4" r="4" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.4"/>
+        <circle cx="125" cy="4" r="2" fill="#284BAC"/>
+        <circle cx="135" cy="4" r="2" fill="#284BAC"/>
+        <!-- Head — chunky rounded rect inspired by reference -->
+        <rect x="68" y="18" width="124" height="88" rx="14" ry="14" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.8"/>
+        <rect x="76" y="26" width="108" height="72" rx="9" fill="none" stroke="#284BAC" stroke-width="0.55" opacity="0.3"/>
+        <!-- Large V-visor pointing downward (ref style) -->
+        <path d="M80,36 L100,32 L160,32 L180,36 L168,68 L130,82 L92,68 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M88,38 L106,34 L154,34 L172,38 L161,66 L130,78 L99,66 Z" fill="none" stroke="#284BAC" stroke-width="0.5" opacity="0.35"/>
+        <!-- Eyes inside visor -->
+        <circle cx="112" cy="52" r="11" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3"/>
+        <circle cx="148" cy="52" r="11" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3"/>
+        <circle cx="112" cy="52" r="6.5" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="148" cy="52" r="6.5" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="112" cy="52" r="3.5" fill="#284BAC" opacity="0.85"/>
+        <circle cx="148" cy="52" r="3.5" fill="#284BAC" opacity="0.85"/>
+        <circle cx="114" cy="50" r="1.5" fill="#FDFBF7"/>
+        <circle cx="150" cy="50" r="1.5" fill="#FDFBF7"/>
+        <!-- Chin grille -->
+        <rect x="106" y="90" width="48" height="12" rx="2" fill="none" stroke="#284BAC" stroke-width="0.8" opacity="0.5"/>
+        <line x1="112" y1="93" x2="112" y2="99" stroke="#284BAC" stroke-width="0.8" opacity="0.5"/>
+        <line x1="118" y1="93" x2="118" y2="99" stroke="#284BAC" stroke-width="0.8" opacity="0.5"/>
+        <line x1="124" y1="93" x2="124" y2="99" stroke="#284BAC" stroke-width="0.8" opacity="0.5"/>
+        <line x1="130" y1="93" x2="130" y2="99" stroke="#284BAC" stroke-width="0.8" opacity="0.5"/>
+        <line x1="136" y1="93" x2="136" y2="99" stroke="#284BAC" stroke-width="0.8" opacity="0.5"/>
+        <line x1="142" y1="93" x2="142" y2="99" stroke="#284BAC" stroke-width="0.8" opacity="0.5"/>
+        <line x1="148" y1="93" x2="148" y2="99" stroke="#284BAC" stroke-width="0.8" opacity="0.5"/>
+        <!-- Neck coil -->
+        <ellipse cx="130" cy="108" rx="20" ry="6" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.2"/>
+        <path d="M112,108 Q112,113 130,115 Q148,113 148,108" fill="none" stroke="#284BAC" stroke-width="0.9" opacity="0.45"/>
+        <path d="M112,112 Q112,117 130,120 Q148,117 148,112" fill="none" stroke="#284BAC" stroke-width="0.9" opacity="0.35"/>
+        <ellipse cx="130" cy="122" rx="22" ry="6" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.2"/>
+        <!-- Torso — barrel organic shape -->
+        <path d="M74,130 Q66,150 70,180 Q74,206 130,210 Q186,206 190,180 Q194,150 186,130 Q166,122 130,122 Q94,122 74,130 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.8" stroke-linejoin="round"/>
+        <!-- Shoulder pads — chunky like reference -->
+        <path d="M74,130 Q56,126 50,142 Q46,158 62,164 Q74,166 80,152 Q82,140 74,130 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M186,130 Q204,126 210,142 Q214,158 198,164 Q186,166 180,152 Q178,140 186,130 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M54,144 Q58,155 68,159" fill="none" stroke="#284BAC" stroke-width="0.5" opacity="0.4"/>
+        <path d="M206,144 Q202,155 192,159" fill="none" stroke="#284BAC" stroke-width="0.5" opacity="0.4"/>
+        <!-- Chest reactor concentric circles -->
+        <circle cx="130" cy="162" r="28" fill="none" stroke="#284BAC" stroke-width="1.4"/>
+        <circle cx="130" cy="162" r="21" fill="none" stroke="#284BAC" stroke-width="0.7" opacity="0.5"/>
+        <circle cx="130" cy="162" r="14" fill="none" stroke="#284BAC" stroke-width="1"/>
+        <circle cx="130" cy="162" r="7" fill="none" stroke="#284BAC" stroke-width="1.2"/>
+        <circle cx="130" cy="162" r="3" fill="#284BAC" opacity="0.75"/>
+        <line x1="130" y1="134" x2="130" y2="140" stroke="#284BAC" stroke-width="0.6" opacity="0.35"/>
+        <line x1="130" y1="184" x2="130" y2="190" stroke="#284BAC" stroke-width="0.6" opacity="0.35"/>
+        <line x1="102" y1="162" x2="108" y2="162" stroke="#284BAC" stroke-width="0.6" opacity="0.35"/>
+        <line x1="152" y1="162" x2="158" y2="162" stroke="#284BAC" stroke-width="0.6" opacity="0.35"/>
+        <!-- small side panel -->
+        <circle cx="158" cy="138" r="9" fill="#FDFBF7" stroke="#284BAC" stroke-width="0.9"/>
+        <circle cx="158" cy="138" r="4" fill="none" stroke="#284BAC" stroke-width="0.6" opacity="0.5"/>
+        <circle cx="158" cy="138" r="1.5" fill="#284BAC" opacity="0.6"/>
+        <!-- side vents left -->
+        <line x1="76" y1="178" x2="76" y2="186" stroke="#284BAC" stroke-width="1.5"/>
+        <line x1="80" y1="176" x2="80" y2="184" stroke="#284BAC" stroke-width="1.5"/>
+        <line x1="84" y1="174" x2="84" y2="182" stroke="#284BAC" stroke-width="1.5"/>
+        <!-- side vents right -->
+        <line x1="184" y1="178" x2="184" y2="186" stroke="#284BAC" stroke-width="1.5"/>
+        <line x1="180" y1="176" x2="180" y2="184" stroke="#284BAC" stroke-width="1.5"/>
+        <line x1="176" y1="174" x2="176" y2="182" stroke="#284BAC" stroke-width="1.5"/>
+        <!-- Hip -->
+        <path d="M94,206 Q94,220 110,224 Q130,228 150,224 Q166,220 166,206 Q148,212 130,212 Q112,212 94,206 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.2"/>
+        <circle cx="130" cy="218" r="9" fill="#FDFBF7" stroke="#284BAC" stroke-width="1"/>
+        <circle cx="130" cy="218" r="4" fill="none" stroke="#284BAC" stroke-width="0.6" opacity="0.5"/>
+        <!-- Left arm -->
+        <circle cx="60" cy="152" r="14" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3"/>
+        <circle cx="60" cy="152" r="8" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="60" cy="152" r="3" fill="#284BAC" opacity="0.7"/>
+        <path d="M48,162 Q42,178 44,204 Q46,218 60,222 Q74,218 76,204 Q78,178 72,162 Q66,156 60,156 Q54,156 48,162 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3" stroke-linejoin="round"/>
+        <circle cx="60" cy="220" r="11" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.2"/>
+        <circle cx="60" cy="220" r="6" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="60" cy="220" r="2.5" fill="#284BAC" opacity="0.6"/>
+        <path d="M48,228 Q44,244 46,262 Q48,274 60,278 Q72,274 74,262 Q76,244 72,228 Q66,222 60,222 Q54,222 48,228 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3" stroke-linejoin="round"/>
+        <!-- blob hand L -->
+        <ellipse cx="60" cy="282" rx="15" ry="11" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3"/>
+        <ellipse cx="52" cy="278" rx="7" ry="9" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.1"/>
+        <ellipse cx="68" cy="278" rx="7" ry="9" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.1"/>
+        <!-- Right arm -->
+        <circle cx="200" cy="152" r="14" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3"/>
+        <circle cx="200" cy="152" r="8" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="200" cy="152" r="3" fill="#284BAC" opacity="0.7"/>
+        <path d="M212,162 Q218,178 216,204 Q214,218 200,222 Q186,218 184,204 Q182,178 188,162 Q194,156 200,156 Q206,156 212,162 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3" stroke-linejoin="round"/>
+        <circle cx="200" cy="220" r="11" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.2"/>
+        <circle cx="200" cy="220" r="6" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="200" cy="220" r="2.5" fill="#284BAC" opacity="0.6"/>
+        <path d="M212,228 Q216,244 214,262 Q212,274 200,278 Q188,274 186,262 Q184,244 188,228 Q194,222 200,222 Q206,222 212,228 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3" stroke-linejoin="round"/>
+        <!-- blob hand R -->
+        <ellipse cx="200" cy="282" rx="15" ry="11" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.3"/>
+        <ellipse cx="192" cy="278" rx="7" ry="9" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.1"/>
+        <ellipse cx="208" cy="278" rx="7" ry="9" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.1"/>
+        <!-- Left leg -->
+        <circle cx="108" cy="228" r="12" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.2"/>
+        <circle cx="108" cy="228" r="6" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="108" cy="228" r="2.5" fill="#284BAC" opacity="0.65"/>
+        <path d="M96,234 Q90,252 92,272 Q94,288 108,292 Q122,288 124,272 Q126,252 120,234 Q114,228 108,228 Q102,228 96,234 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="108" cy="292" r="14" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.4"/>
+        <circle cx="108" cy="292" r="8" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="108" cy="292" r="3" fill="#284BAC" opacity="0.7"/>
+        <path d="M94,302 Q90,318 92,338 Q94,352 108,356 Q122,352 124,338 Q126,318 122,302 Q116,296 108,296 Q100,296 94,302 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- foot L -->
+        <path d="M86,354 Q80,358 78,368 Q80,378 90,378 L126,378 Q134,378 134,368 Q132,358 122,354 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.5" stroke-linejoin="round"/>
+        <line x1="80" y1="378" x2="134" y2="378" stroke="#284BAC" stroke-width="2"/>
+        <!-- Right leg -->
+        <circle cx="152" cy="228" r="12" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.2"/>
+        <circle cx="152" cy="228" r="6" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="152" cy="228" r="2.5" fill="#284BAC" opacity="0.65"/>
+        <path d="M164,234 Q170,252 168,272 Q166,288 152,292 Q138,288 136,272 Q134,252 140,234 Q146,228 152,228 Q158,228 164,234 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.5" stroke-linejoin="round"/>
+        <circle cx="152" cy="292" r="14" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.4"/>
+        <circle cx="152" cy="292" r="8" fill="none" stroke="#284BAC" stroke-width="0.7"/>
+        <circle cx="152" cy="292" r="3" fill="#284BAC" opacity="0.7"/>
+        <path d="M166,302 Q170,318 168,338 Q166,352 152,356 Q138,352 136,338 Q134,318 138,302 Q144,296 152,296 Q160,296 166,302 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.5" stroke-linejoin="round"/>
+        <!-- foot R -->
+        <path d="M174,354 Q180,358 182,368 Q180,378 170,378 L134,378 Q126,378 126,368 Q128,358 138,354 Z" fill="#FDFBF7" stroke="#284BAC" stroke-width="1.5" stroke-linejoin="round"/>
+        <line x1="126" y1="378" x2="180" y2="378" stroke="#284BAC" stroke-width="2"/>
+        <!-- ground shadow -->
+        <ellipse cx="130" cy="384" rx="72" ry="4" fill="none" stroke="#284BAC" stroke-width="0.5" opacity="0.18"/>
+      </svg>
+      </div>
+      <p class="empty-text">Your robot awaits.<br>Fill in your human data.</p>
+      <p class="empty-sub">Personality DNA → Hardware Synthesis</p>
+      <div class="empty-status"><span class="status-dot"></span><span id="status-text">Awaiting input</span></div>
+    </div>
+
+    <div class="result-area" id="result-area">
+      <div class="robot-header">
+        <div class="robot-id-block">
+          <span class="robot-designation" id="res-designation">Unit Designation</span>
+          <span class="robot-name" id="res-name">—</span>
+          <span class="robot-model" id="res-model">—</span>
+        </div>
+        <div class="robot-tagline-block">
+          <p class="robot-tagline" id="res-tagline">—</p>
+        </div>
+        <div class="robot-class-block">
+          <span class="robot-class-label">Classification</span>
+          <span class="robot-class-value" id="res-class">—</span>
+          <span class="robot-class-label" style="margin-top:8px">Threat Level</span>
+          <span class="robot-class-value" id="res-threat" style="color: var(--accent)">—</span>
+        </div>
+      </div>
+      <div class="robot-body">
+        <div class="robot-visual">
+          <div class="robot-svg-container" id="robot-svg-container"></div>
+          <div class="robot-stats-mini" id="stats-container"></div>
+        </div>
+        <div class="robot-details" id="robot-details"></div>
+      </div>
+    </div>
+
+    <div class="loading-overlay" id="loading-overlay">
+      <div class="loading-steps">
+        <span class="loading-step active" id="ls1">Analyzing personality matrix...</span>
+        <span class="loading-step" id="ls2">Cross-referencing zodiac firmware...</span>
+        <span class="loading-step" id="ls3">Calibrating fear protocols...</span>
+        <span class="loading-step" id="ls4">Rendering chassis blueprint...</span>
+      </div>
+      <div class="loading-progress"><div class="loading-bar"></div></div>
+      <span class="loading-label">Synthesizing your unit</span>
+    </div>
+
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-cell">
+    <span class="footer-label">UNIT-YOU Laboratory</span>
+    <span class="footer-val">EST. 2157</span>
+  </div>
+  <div class="footer-cell">
+    <span class="footer-label" id="footer-session">Session: awaiting input</span>
+    <span class="footer-val">SECURE</span>
+  </div>
+  <div class="footer-cell">
+    <span class="footer-label">Personality Engine</span>
+    <span class="footer-val">CLAUDE SONNET</span>
+  </div>
+</footer>
+
+<script>
+// ═══════════════════════════════════════
+// MBTI QUIZ DATA
+// ═══════════════════════════════════════
+const quizQuestions = [
+  {
+    axis: 'E / I', axisLabel: 'Energy',
+    q: 'After a long week, your ideal Friday night is:',
+    options: [
+      { text: 'A packed house party — I recharge around people', axis: 'E', weight: 2 },
+      { text: 'Small dinner with close friends, good conversation', axis: 'E', weight: 1 },
+      { text: 'Cozy night in, maybe one friend over', axis: 'I', weight: 1 },
+      { text: 'Completely alone. No texts. Bliss.', axis: 'I', weight: 2 },
+    ]
+  },
+  {
+    axis: 'E / I', axisLabel: 'Energy',
+    q: 'When solving a problem, you prefer to:',
+    options: [
+      { text: 'Talk it out loud with anyone who will listen', axis: 'E', weight: 2 },
+      { text: 'Discuss it with one trusted person', axis: 'E', weight: 1 },
+      { text: 'Think quietly before sharing your conclusion', axis: 'I', weight: 1 },
+      { text: 'Disappear into your head and emerge with the answer', axis: 'I', weight: 2 },
+    ]
+  },
+  {
+    axis: 'S / N', axisLabel: 'Information',
+    q: 'You trust more:',
+    options: [
+      { text: 'What I can see, touch, and verify with my own eyes', axis: 'S', weight: 2 },
+      { text: 'Practical experience and track records', axis: 'S', weight: 1 },
+      { text: 'Patterns and what they suggest about the future', axis: 'N', weight: 1 },
+      { text: 'My gut feeling about how things could be', axis: 'N', weight: 2 },
+    ]
+  },
+  {
+    axis: 'S / N', axisLabel: 'Information',
+    q: 'When reading, you prefer:',
+    options: [
+      { text: 'How-to guides, biographies, practical nonfiction', axis: 'S', weight: 2 },
+      { text: 'Case studies and real-world examples', axis: 'S', weight: 1 },
+      { text: 'Big-idea books that reshape how I see the world', axis: 'N', weight: 1 },
+      { text: 'Dense theory or speculative fiction — the weirder the better', axis: 'N', weight: 2 },
+    ]
+  },
+  {
+    axis: 'T / F', axisLabel: 'Decisions',
+    q: 'A friend vents about a bad decision they made. You:',
+    options: [
+      { text: 'Gently point out where they went wrong and how to fix it', axis: 'T', weight: 2 },
+      { text: 'Acknowledge it, then offer honest analysis', axis: 'T', weight: 1 },
+      { text: 'Mostly listen and validate their feelings', axis: 'F', weight: 1 },
+      { text: 'Make them feel fully heard — the analysis can wait', axis: 'F', weight: 2 },
+    ]
+  },
+  {
+    axis: 'T / F', axisLabel: 'Decisions',
+    q: 'When making a big life decision, you rely on:',
+    options: [
+      { text: 'Logic, data, pros-and-cons lists', axis: 'T', weight: 2 },
+      { text: 'What makes the most rational sense overall', axis: 'T', weight: 1 },
+      { text: 'How it aligns with my values and who it affects', axis: 'F', weight: 1 },
+      { text: 'Whether it feels right in my chest', axis: 'F', weight: 2 },
+    ]
+  },
+  {
+    axis: 'J / P', axisLabel: 'Structure',
+    q: 'Your ideal travel style is:',
+    options: [
+      { text: 'Fully planned itinerary, booked 3 months ahead', axis: 'J', weight: 2 },
+      { text: 'Rough plan with confirmed hotels', axis: 'J', weight: 1 },
+      { text: 'General destination, figure the rest out there', axis: 'P', weight: 1 },
+      { text: 'Pack a bag and go. Plans are a cage.', axis: 'P', weight: 2 },
+    ]
+  },
+  {
+    axis: 'J / P', axisLabel: 'Structure',
+    q: 'Your relationship with deadlines:',
+    options: [
+      { text: 'Done early. Late is my nightmare.', axis: 'J', weight: 2 },
+      { text: 'On time, usually with a buffer', axis: 'J', weight: 1 },
+      { text: 'I work best with a little pressure', axis: 'P', weight: 1 },
+      { text: 'The deadline IS my start time. Works great.', axis: 'P', weight: 2 },
+    ]
+  }
+];
+
+const mbtiDescriptions = {
+  INTJ: { nick: 'The Architect', blurb: 'You see the whole system while everyone else argues about the parts. Brilliant, ruthlessly strategic, and occasionally baffled that not everyone thinks as clearly as you do.' },
+  INTP: { nick: 'The Logician', blurb: 'Your brain is a perpetual motion machine of ideas. You\'d rather find the perfect answer than a fast one, which is why you\'re still "almost done" with that project from 2019.' },
+  ENTJ: { nick: 'The Commander', blurb: 'Born to lead — or at least, born convinced of it. You see inefficiency the way others see a mess, and you simply cannot leave it alone.' },
+  ENTP: { nick: 'The Debater', blurb: 'You argue the other side just to see if it holds up. Your superpower is generating 40 ideas in 10 minutes. Your weakness is finishing any of them.' },
+  INFJ: { nick: 'The Advocate', blurb: 'You know what people need before they do, which is either a gift or a burden depending on the day. You\'re the rarest type and you probably already knew that.' },
+  INFP: { nick: 'The Mediator', blurb: 'You feel everything at full volume. Idealistic to a fault, endlessly creative, and secretly writing an emotionally devastating novel in your Notes app.' },
+  ENFJ: { nick: 'The Protagonist', blurb: 'You make people feel seen, and you\'re on a quiet mission to make the world better. Exhausting to be so caring. You do it anyway.' },
+  ENFP: { nick: 'The Campaigner', blurb: 'Wildly enthusiastic about everything — for about three weeks. You collect passions like others collect debt, and you\'re somehow magnetic while doing it.' },
+  ISTJ: { nick: 'The Logistician', blurb: 'Reliable, precise, deeply underrated. You\'re the person who actually reads the manual and is right about it. Society would collapse in 48 hours without your type.' },
+  ISFJ: { nick: 'The Defender', blurb: 'You remember everyone\'s birthday, their allergies, and that one offhand comment they made two years ago. Quietly heroic. Perpetually underappreciated.' },
+  ESTJ: { nick: 'The Executive', blurb: 'Structure isn\'t just a preference — it\'s a moral stance. You run tight ships and you know it. Others call you intense. You call it having standards.' },
+  ESFJ: { nick: 'The Consul', blurb: 'You create community wherever you go. You\'re the social glue, the one who organizes the group chat, and the one who\'s hurt when no one RSVPs.' },
+  ISTP: { nick: 'The Virtuoso', blurb: 'You can fix anything, explain nothing, and remain mysteriously cool throughout. You\'d rather take something apart than talk about your feelings. Fair.' },
+  ISFP: { nick: 'The Adventurer', blurb: 'Intensely creative, intensely private. You live in the present with quiet ferocity. You\'re the one with the best taste and the least Instagram followers.' },
+  ESTP: { nick: 'The Entrepreneur', blurb: 'Born to improvise. You thrive in chaos, charm everyone in the room, and solve problems while still moving at full speed. Planning is for people who are scared.' },
+  ESFP: { nick: 'The Entertainer', blurb: 'Life is a performance and you are absolutely the main character. Spontaneous, generous, and the first on the dance floor. You make everything more fun. Never change.' },
+};
+
+// ═══════════════════════════════════════
+// QUIZ STATE
+// ═══════════════════════════════════════
+let quizState = { step: 0, answers: [], scores: { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 } };
+let quizResult = null;
+
+function openMbtiQuiz() {
+  quizState = { step: 0, answers: Array(quizQuestions.length).fill(null), scores: { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 } };
+  quizResult = null;
+  document.getElementById('quiz-result').classList.remove('active');
+  document.getElementById('quiz-result').style.display = 'none';
+  renderQuizStep();
+  document.getElementById('quiz-backdrop').classList.add('open');
+}
+
+function closeQuiz() {
+  document.getElementById('quiz-backdrop').classList.remove('open');
+}
+
+function renderQuizStep() {
+  const q = quizQuestions[quizState.step];
+  const total = quizQuestions.length;
+  const pct = (quizState.step / total) * 100;
+  document.getElementById('quiz-progress').style.width = pct + '%';
+
+  const html = `
+    <div class="quiz-step active">
+      <div class="quiz-q-meta">
+        Question ${quizState.step + 1} of ${total}
+        <span class="quiz-q-axis">${q.axisLabel}</span>
+      </div>
+      <div class="quiz-question">${q.q}</div>
+      <div class="quiz-options">
+        ${q.options.map((opt, i) => `
+          <div class="quiz-option ${quizState.answers[quizState.step] === i ? 'selected' : ''}"
+               onclick="selectOption(${i})">
+            <span class="option-letter">${String.fromCharCode(65+i)}.</span>
+            <span class="option-text">${opt.text}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="quiz-nav">
+        <span class="quiz-counter">${quizState.step + 1} / ${total}</span>
+        <button class="quiz-btn"
+          onclick="nextStep()"
+          ${quizState.answers[quizState.step] === null ? 'disabled' : ''}>
+          ${quizState.step < total - 1 ? 'Next →' : 'See my type →'}
+        </button>
+      </div>
+    </div>`;
+
+  document.getElementById('quiz-body').innerHTML = html;
+}
+
+function selectOption(idx) {
+  quizState.answers[quizState.step] = idx;
+  renderQuizStep();
+}
+
+function nextStep() {
+  const q = quizQuestions[quizState.step];
+  const chosen = q.options[quizState.answers[quizState.step]];
+  quizState.scores[chosen.axis] += chosen.weight;
+
+  if (quizState.step < quizQuestions.length - 1) {
+    quizState.step++;
+    renderQuizStep();
+  } else {
+    showQuizResult();
+  }
+}
+
+function showQuizResult() {
+  const s = quizState.scores;
+  const type =
+    (s.E >= s.I ? 'E' : 'I') +
+    (s.S >= s.N ? 'S' : 'N') +
+    (s.T >= s.F ? 'T' : 'F') +
+    (s.J >= s.P ? 'J' : 'P');
+
+  quizResult = type;
+  const desc = mbtiDescriptions[type];
+
+  document.getElementById('quiz-progress').style.width = '100%';
+  document.getElementById('quiz-body').innerHTML = '';
+
+  document.getElementById('result-type-display').textContent = type;
+  document.getElementById('result-nickname').textContent = desc.nick;
+  document.getElementById('result-blurb').textContent = desc.blurb;
+
+  // Axis bars
+  const axes = [
+    { a: 'E', b: 'I', label: 'Extraversion vs Introversion' },
+    { a: 'S', b: 'N', label: 'Sensing vs Intuition' },
+    { a: 'T', b: 'F', label: 'Thinking vs Feeling' },
+    { a: 'J', b: 'P', label: 'Judging vs Perceiving' },
+  ];
+  document.getElementById('result-axes').innerHTML = axes.map(ax => {
+    const total = (s[ax.a] || 0) + (s[ax.b] || 0) || 1;
+    const pct = Math.round((s[ax.a] / total) * 100);
+    const winner = s[ax.a] >= s[ax.b] ? ax.a : ax.b;
+    const winPct = s[ax.a] >= s[ax.b] ? pct : 100 - pct;
+    return `
+      <div class="result-axis-item">
+        <span class="result-axis-name">${ax.label}</span>
+        <span class="result-axis-val">${winner} — ${winPct}%</span>
+        <div class="result-axis-bar">
+          <div class="result-axis-fill" style="width:${winPct}%"></div>
+        </div>
+      </div>`;
+  }).join('');
+
+  const resultEl = document.getElementById('quiz-result');
+  resultEl.style.display = 'block';
+  resultEl.classList.add('active');
+}
+
+function applyMbtiResult() {
+  if (!quizResult) return;
+  setSelectVal('mbti-select', quizResult);
+
+  const desc = mbtiDescriptions[quizResult];
+  document.getElementById('badge-type-val').textContent = quizResult;
+  document.getElementById('badge-type-desc').textContent = desc.nick + ' — quiz result';
+  document.getElementById('mbti-result-badge').style.display = 'flex';
+
+  closeQuiz();
+}
+
+// ═══════════════════════════════════════
+// SUGGEST PILLS
+// ═══════════════════════════════════════
+// Split emoji from text in suggest pills for proper flex gap
+document.querySelectorAll('.suggest-pill').forEach(pill => {
+  const raw = pill.textContent.trim();
+  // Simple split: grab all leading non-letter chars (emoji block) then rest
+  const m = raw.match(/^([^\p{L}\p{N}\s][^\p{L}]*)?\s*(.+)$/u);
+  if (m && m[1] && m[2]) {
+    pill.innerHTML = '<span class="pill-emoji">' + m[1].trim() + '</span><span class="pill-text">' + m[2].trim() + '</span>';
+  }
+});
+
+document.querySelectorAll('.suggest-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    const el = document.getElementById(pill.dataset.target);
+    if (!el) return;
+    const v = pill.dataset.val;
+    el.value = v.charAt(0).toUpperCase() + v.slice(1);
+    pill.closest('.suggest-row').querySelectorAll('.suggest-pill').forEach(p => p.classList.remove('used'));
+    pill.classList.add('used');
+    el.style.transition = 'background 0.2s';
+    el.style.background = 'var(--accent-light)';
+    el.style.borderColor = 'var(--accent)';
+    setTimeout(() => { el.style.background = ''; el.style.borderColor = ''; }, 500);
+  });
+});
+
+document.querySelectorAll('input[type="text"], textarea').forEach(el => {
+  el.addEventListener('input', function() {
+    if (this.value.length > 0) {
+      const pos = this.selectionStart;
+      this.value = this.value.charAt(0).toUpperCase() + this.value.slice(1);
+      this.setSelectionRange(pos, pos);
+    }
+  });
+});
+
+// ═══════════════════════════════════════
+// CHIPS
+// ═══════════════════════════════════════
+function initChips(containerId, max) {
+  document.getElementById(containerId).querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      if (max === 1) {
+        // Radio behavior: always select clicked, deselect others
+        document.getElementById(containerId).querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+      } else {
+        // Multi: toggle, but cap at max; clicking active removes it
+        if (chip.classList.contains('active')) {
+          chip.classList.remove('active');
+        } else {
+          const active = document.getElementById(containerId).querySelectorAll('.chip.active');
+          if (active.length < max) chip.classList.add('active');
+          else {
+            // Replace the first active one with the new click
+            active[0].classList.remove('active');
+            chip.classList.add('active');
+          }
+        }
+      }
+    });
+  });
+}
+// Wrap initChips to also trigger validation after chip clicks
+const _origInitChips = initChips;
+initChips('use-chips', 2);
+initChips('vibe-chips', 1);
+
+// ── SYNTHESIZE BUTTON VALIDATION ──
+function checkGenerateReady() {
+  const btn = document.getElementById('generate-btn');
+  if (!btn) return;
+  const zodiac = getSelectVal('zodiac-select');
+  const mbti   = getSelectVal('mbti-select');
+  const name   = document.getElementById('name')?.value.trim();
+  btn.disabled = !(name && zodiac && mbti);
+}
+
+// Watch all required inputs
+['name'].forEach(id => {
+  document.getElementById(id)?.addEventListener('input', checkGenerateReady);
+});
+// Watch custom selects via MutationObserver on their trigger text
+['zodiac-select', 'mbti-select'].forEach(id => {
+  const trigger = document.querySelector(`[onclick*="${id}"]`);
+  if (trigger) new MutationObserver(checkGenerateReady).observe(trigger, { childList: true, subtree: true, characterData: true });
+});
+// Also hook into setSelectVal
+const _origSetSelectVal = setSelectVal;
+setSelectVal = function(id, val) { _origSetSelectVal(id, val); checkGenerateReady(); };
+
+// ── RESTORE API KEY ──
+(function() {
+  const saved = localStorage.getItem('unit_you_key');
+  if (saved) { const el = document.getElementById('api-key-input'); if (el) el.value = saved; }
+})();
+
+// ── BOOT SEQUENCE ──
+(function() {
+  const steps = [
+    { label: 'SYS', text: 'Loading personality engine' },
+    { label: 'HW',  text: 'Mounting hardware drivers' },
+    { label: 'AI',  text: 'Calibrating chaos index' },
+    { label: 'NET', text: 'Connecting to synthesis core' },
+    { label: 'OK',  text: 'System ready' },
+  ];
+  const log    = document.getElementById('boot-log');
+  const bar    = document.getElementById('boot-bar');
+  const pct    = document.getElementById('boot-pct');
+  const overlay = document.getElementById('boot-overlay');
+  let i = 0;
+
+  function addLine(step, done) {
+    const line = document.createElement('div');
+    line.className = 'boot-log-line' + (done ? '' : ' pending');
+    line.innerHTML = `<span class="bl-label">[${step.label}]</span><span class="bl-text">${step.text}</span>${done ? '<span class="bl-ok">✓</span>' : ''}`;
+    log.appendChild(line);
+  }
+
+  function tick() {
+    if (i > 0) {
+      const prev = log.querySelectorAll('.boot-log-line');
+      const last = prev[prev.length - 1];
+      if (last) {
+        last.classList.remove('pending');
+        last.innerHTML = `<span class="bl-label">[${steps[i-1].label}]</span><span class="bl-text">${steps[i-1].text}</span><span class="bl-ok">✓</span>`;
+      }
+    }
+    const progress = Math.round((i / steps.length) * 100);
+    bar.style.width = progress + '%';
+    pct.textContent = progress + '%';
+
+    if (i < steps.length) {
+      addLine(steps[i], false);
+      i++;
+      setTimeout(tick, i === steps.length ? 180 : 320);
+    } else {
+      bar.style.width = '100%';
+      pct.textContent = '100%';
+      setTimeout(() => {
+        overlay.classList.add('exit');
+        setTimeout(() => {
+          overlay.remove();
+          document.querySelector('.header').classList.add('intro-done');
+          document.querySelector('.main').classList.add('intro-done');
+          document.querySelector('.footer').classList.add('intro-done');
+        }, 700);
+      }, 300);
+    }
+  }
+
+  setTimeout(tick, 600);
+})();
+
+// ── STATUS CYCLING ──
+const statusMessages = [
+  'Awaiting input', 'Scanning personality matrix', 'Calibrating empathy core',
+  'Loading zodiac drivers', 'Warming up sass module', 'Checking chaos index',
+  'Initializing hardware', 'Standing by'
+];
+let statusIdx = 0;
+setInterval(() => {
+  statusIdx = (statusIdx + 1) % statusMessages.length;
+  const el = document.getElementById('status-text');
+  if (el) el.textContent = statusMessages[statusIdx];
+}, 2800);
+
+function getChipValues(id) {
+  return [...document.querySelectorAll(`#${id} .chip.active`)].map(c => c.dataset.val);
+}
+
+// ═══════════════════════════════════════
+// ROBOT SVG — Illustrated Edition
+// ═══════════════════════════════════════
+function generateRobotSVG(vibe, zodiac, fear, name, mbti) {
+  const K  = '#284BAC';
+  const BG = '#FDFBF7';
+  const S  = 1.5; // single uniform stroke weight
+
+  // Deterministic seed from ALL inputs
+  const seedStr = (name||'X') + (zodiac||'Z') + (mbti||'M') + (vibe||'V') + (fear||'F');
+  const seed = seedStr.split('').reduce((a, c, i) => ((a << 5) - a + c.charCodeAt(0) * (i + 1)) | 0, 0x1337BEEF);
+  const rng   = (n) => ((Math.abs(seed) * 1664525 + n * 22695477 + 1013904223) >>> 0) / 4294967296;
+  const range = (lo, hi, n = 0) => lo + Math.round(rng(n) * (hi - lo));
+
+  // Zodiac element groups
+  const fire  = ['Aries','Leo','Sagittarius'];
+  const earth = ['Taurus','Virgo','Capricorn'];
+
+  // Fear flags for eye shape
+  const lonely  = !!(fear && /alone|abandon|loneli/i.test(fear));
+  const control = !!(fear && /control|power|domin/i.test(fear));
+  const failure = !!(fear && /fail|enough|fraud|impos/i.test(fear));
+
+  // Zodiac → eye shape (0=angular, 1=square, 2=oval)
+  const eyeVar = fire.includes(zodiac) ? 0 : earth.includes(zodiac) ? 1 : 2;
+
+  // Micro-variations
+  const v1 = range(0, 8, 1);
+  const v2 = range(0, 8, 2);
+  const v3 = range(0, 6, 3);
+
+  const unitId = Math.abs(seed) % 10000;
+  const annotations = `<text x="130" y="388" text-anchor="middle" font-family="monospace" font-size="7.5" fill="${K}">${(name||'UNIT').toUpperCase().slice(0,8)}-${unitId}</text>`;
+
+  const v = vibe || 'Sleek & Minimal';
+  if (v === 'Sleek & Minimal')   return buildSleek();
+  if (v === 'Chunky & Retro')    return buildChunky();
+  if (v === 'Organic & Fluid')   return buildOrganic();
+  if (v === 'Military Grade')    return buildMilitary();
+  if (v === 'Cute & Round')      return buildCute();
+  if (v === 'Gothic Industrial') return buildGothic();
+  return buildSleek();
+
+  // ─────────────────────────────────────────────────────────
+  // 1. SLEEK & MINIMAL
+  // ─────────────────────────────────────────────────────────
+  function buildSleek() {
+    const hW = 86 + v1, hH = 52 + v2, hX = 130 - hW/2, hY = 32;
+
+    const antenna = `
+      <line x1="130" y1="${hY}" x2="130" y2="${hY - 22}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="130" cy="${hY - 22}" r="3" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const head = `
+      <rect x="${hX}" y="${hY}" width="${hW}" height="${hH}" rx="10"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const vsY = hY + 14, vsH = 18;
+    const visor = `
+      <rect x="${hX + 10}" y="${vsY}" width="${hW - 20}" height="${vsH}" rx="4"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const ecy = vsY + vsH/2;
+    const eyeL = eyeVar === 0
+      ? `<line x1="${hX + 18}" y1="${ecy - 3}" x2="${hX + 26}" y2="${ecy + 3}" stroke="${K}" stroke-width="${S}"/>
+         <line x1="${hX + 18}" y1="${ecy + 3}" x2="${hX + 26}" y2="${ecy - 3}" stroke="${K}" stroke-width="${S}"/>`
+      : eyeVar === 1
+      ? `<rect x="${hX + 16}" y="${ecy - 3}" width="8" height="6" rx="1" fill="${K}" stroke="${K}" stroke-width="${S}"/>`
+      : `<circle cx="${hX + 20}" cy="${ecy}" r="4" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+    const eyeR = eyeVar === 0
+      ? `<line x1="${hX + hW - 26}" y1="${ecy - 3}" x2="${hX + hW - 18}" y2="${ecy + 3}" stroke="${K}" stroke-width="${S}"/>
+         <line x1="${hX + hW - 26}" y1="${ecy + 3}" x2="${hX + hW - 18}" y2="${ecy - 3}" stroke="${K}" stroke-width="${S}"/>`
+      : eyeVar === 1
+      ? `<rect x="${hX + hW - 24}" y="${ecy - 3}" width="8" height="6" rx="1" fill="${K}" stroke="${K}" stroke-width="${S}"/>`
+      : `<circle cx="${hX + hW - 20}" cy="${ecy}" r="4" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const nkY = hY + hH;
+    const neck = `
+      <rect x="120" y="${nkY}" width="8" height="12" rx="2" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="132" y="${nkY}" width="8" height="12" rx="2" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const tY = nkY + 12, tW = 68 + v2, tH = 90 + v1, tX = 130 - tW/2;
+    const torso = `
+      <rect x="${tX}" y="${tY}" width="${tW}" height="${tH}" rx="8"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="130" cy="${tY + 28}" r="${10 + v1}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const aW = 14, aH = 72 + v2, hR = 9 + v1;
+    const arms = `
+      <rect x="${tX - aW - 2}" y="${tY + 8}" width="${aW}" height="${aH}" rx="6"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${tX - aW/2 - 2}" cy="${tY + 8 + aH + hR - 2}" r="${hR}"
+              fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX + tW + 2}" y="${tY + 8}" width="${aW}" height="${aH}" rx="6"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${tX + tW + aW/2 + 2}" cy="${tY + 8 + aH + hR - 2}" r="${hR}"
+              fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const lY = tY + tH, lW = 16, lH = 78 + v3, fW = 22;
+    const legs = `
+      <rect x="${130 - lW - 4}" y="${lY}" width="${lW}" height="${lH}" rx="5"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 - fW - 2}" y="${lY + lH - 4}" width="${fW}" height="18" rx="5"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 + 4}" y="${lY}" width="${lW}" height="${lH}" rx="5"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 + 2}" y="${lY + lH - 4}" width="${fW}" height="18" rx="5"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    return `<svg viewBox="24 0 212 395" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      ${antenna}${head}${visor}${eyeL}${eyeR}${neck}${torso}${arms}${legs}${annotations}
+    </svg>`;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // 2. CHUNKY & RETRO
+  // ─────────────────────────────────────────────────────────
+  function buildChunky() {
+    const hcx = 130, hcy = 66, hrx = 44 + v1, hry = 38 + v2;
+
+    const antenna = `
+      <line x1="${hcx - 16}" y1="${hcy - hry}" x2="${hcx - 16}" y2="${hcy - hry - 18}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx - 16}" cy="${hcy - hry - 18}" r="4" fill="${K}" stroke="${K}" stroke-width="${S}"/>
+      <line x1="${hcx}" y1="${hcy - hry}" x2="${hcx}" y2="${hcy - hry - 28}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx}" cy="${hcy - hry - 28}" r="5" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <line x1="${hcx + 16}" y1="${hcy - hry}" x2="${hcx + 16}" y2="${hcy - hry - 18}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx + 16}" cy="${hcy - hry - 18}" r="4" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const head = `
+      <ellipse cx="${hcx}" cy="${hcy}" rx="${hrx}" ry="${hry}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx - hrx}" cy="${hcy}" r="6" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx + hrx}" cy="${hcy}" r="6" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const eyeY = hcy - 8, eR = 11 + v1;
+    const eyeL = `
+      <circle cx="${hcx - 18}" cy="${eyeY}" r="${eR}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx - 18}" cy="${eyeY}" r="${lonely ? eR - 3 : eR - 5}" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+    const eyeR = `
+      <circle cx="${hcx + 18}" cy="${eyeY}" r="${eR}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx + 18}" cy="${eyeY}" r="${lonely ? eR - 3 : eR - 5}" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const mY = hcy + 14;
+    const visor = `
+      <rect x="${hcx - 26}" y="${mY}" width="52" height="12" rx="3"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const nkY = hcy + hry - 2;
+    const neck = `
+      <rect x="${hcx - 14}" y="${nkY}" width="28" height="16" rx="4"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const tY = nkY + 16, tW = 98 + v2, tH = 84 + v1, tX = 130 - tW/2;
+    const torso = `
+      <rect x="${tX}" y="${tY}" width="${tW}" height="${tH}" rx="14"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="130" cy="${tY + 34}" r="20" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="130" cy="${tY + 34}" r="10" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const aY = tY + 6, aW = 22, aH = 68 + v3;
+    const arms = `
+      <circle cx="${tX - 8}" cy="${aY + 10}" r="12" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX - 22}" y="${aY + 20}" width="${aW}" height="${Math.round(aH * 0.55)}" rx="8"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <ellipse cx="${tX - 11}" cy="${aY + 20 + Math.round(aH * 0.55)}" rx="13" ry="6"
+               fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX - 20}" y="${aY + 20 + Math.round(aH * 0.55) + 4}" width="18" height="${Math.round(aH * 0.45)}" rx="6"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${tX + tW + 8}" cy="${aY + 10}" r="12" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX + tW}" y="${aY + 20}" width="${aW}" height="${Math.round(aH * 0.55)}" rx="8"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <ellipse cx="${tX + tW + 11}" cy="${aY + 20 + Math.round(aH * 0.55)}" rx="13" ry="6"
+               fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX + tW + 2}" y="${aY + 20 + Math.round(aH * 0.55) + 4}" width="18" height="${Math.round(aH * 0.45)}" rx="6"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const lY = tY + tH - 4, lW = 22, lH = 60 + v3, fW = 32;
+    const legs = `
+      <rect x="${130 - lW - 6}" y="${lY}" width="${lW}" height="${lH}" rx="8"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 - fW - 2}" y="${lY + lH - 8}" width="${fW}" height="22" rx="8"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 + 6}" y="${lY}" width="${lW}" height="${lH}" rx="8"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 + 2}" y="${lY + lH - 8}" width="${fW}" height="22" rx="8"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    return `<svg viewBox="24 0 212 395" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      ${antenna}${head}${visor}${eyeL}${eyeR}${neck}${torso}${arms}${legs}${annotations}
+    </svg>`;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // 3. ORGANIC & FLUID
+  // ─────────────────────────────────────────────────────────
+  function buildOrganic() {
+    const hcx = 130, hcy = 68, hrx = 36 + v1, hry = 44 + v2;
+
+    const antenna = `
+      <path d="M${hcx},${hcy - hry} Q${hcx - 14},${hcy - hry - 20} ${hcx - 6},${hcy - hry - 38}"
+            fill="none" stroke="${K}" stroke-width="${S}" stroke-linecap="round"/>
+      <circle cx="${hcx - 6}" cy="${hcy - hry - 38}" r="4" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const head = `
+      <ellipse cx="${hcx}" cy="${hcy}" rx="${hrx}" ry="${hry}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const eyeY = hcy - 8, eRx = 9, eRy = 12 + v1;
+    const eyeL = `
+      <ellipse cx="${hcx - 14}" cy="${eyeY}" rx="${eRx}" ry="${eRy}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <ellipse cx="${hcx - 14}" cy="${eyeY}" rx="${lonely ? 6 : 4}" ry="${lonely ? 8 : 6}" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+    const eyeR = `
+      <ellipse cx="${hcx + 14}" cy="${eyeY}" rx="${eRx}" ry="${eRy}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <ellipse cx="${hcx + 14}" cy="${eyeY}" rx="${lonely ? 6 : 4}" ry="${lonely ? 8 : 6}" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const visor = `
+      <path d="M${hcx - 12},${hcy + 18} Q${hcx},${hcy + 26} ${hcx + 12},${hcy + 18}"
+            fill="none" stroke="${K}" stroke-width="${S}" stroke-linecap="round"/>`;
+
+    const nkY = hcy + hry;
+    const neck = `
+      <path d="M${hcx - 10},${nkY} Q${hcx - 14},${nkY + 8} ${hcx - 8},${nkY + 16}
+               L${hcx + 8},${nkY + 16} Q${hcx + 14},${nkY + 8} ${hcx + 10},${nkY} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const tY = nkY + 16, tH = 84 + v1;
+    const torso = `
+      <path d="M${hcx - 26},${tY} Q${hcx - 46},${tY + tH * 0.4} ${hcx - 42},${tY + tH * 0.7}
+               Q${hcx - 38},${tY + tH} ${hcx},${tY + tH}
+               Q${hcx + 38},${tY + tH} ${hcx + 42},${tY + tH * 0.7}
+               Q${hcx + 46},${tY + tH * 0.4} ${hcx + 26},${tY} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx}" cy="${tY + Math.round(tH * 0.44)}" r="${12 + v2}"
+              fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const aY = tY + 10;
+    const arms = `
+      <path d="M${hcx - 26},${aY} Q${hcx - 52},${aY + 14} ${hcx - 54},${aY + 44}
+               Q${hcx - 56},${aY + 70} ${hcx - 44},${aY + 80}"
+            fill="none" stroke="${K}" stroke-width="${S * 2.5}" stroke-linecap="round"/>
+      <ellipse cx="${hcx - 44}" cy="${aY + 88}" rx="10" ry="8" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${hcx + 26},${aY} Q${hcx + 52},${aY + 14} ${hcx + 54},${aY + 44}
+               Q${hcx + 56},${aY + 70} ${hcx + 44},${aY + 80}"
+            fill="none" stroke="${K}" stroke-width="${S * 2.5}" stroke-linecap="round"/>
+      <ellipse cx="${hcx + 44}" cy="${aY + 88}" rx="10" ry="8" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const lY = tY + tH;
+    const legs = `
+      <path d="M${hcx - 18},${lY} Q${hcx - 24},${lY + 32} ${hcx - 20},${lY + 60}"
+            fill="none" stroke="${K}" stroke-width="${S * 2.5}" stroke-linecap="round"/>
+      <ellipse cx="${hcx - 26}" cy="${lY + 68}" rx="18" ry="10" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${hcx + 18},${lY} Q${hcx + 24},${lY + 32} ${hcx + 20},${lY + 60}"
+            fill="none" stroke="${K}" stroke-width="${S * 2.5}" stroke-linecap="round"/>
+      <ellipse cx="${hcx + 26}" cy="${lY + 68}" rx="18" ry="10" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    return `<svg viewBox="24 0 212 395" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      ${antenna}${head}${visor}${eyeL}${eyeR}${neck}${torso}${arms}${legs}${annotations}
+    </svg>`;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // 4. MILITARY GRADE
+  // ─────────────────────────────────────────────────────────
+  function buildMilitary() {
+    const hexPts = (cx, cy, r) => Array.from({length: 6}, (_, i) => {
+      const a = Math.PI / 180 * (60 * i - 30);
+      return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`;
+    }).join(' ');
+
+    const hcy = 64, hR = 36 + v1;
+    const antBase = (hcy - hR * Math.sin(Math.PI / 3)).toFixed(1);
+
+    const antenna = `
+      <line x1="130" y1="${antBase}" x2="130" y2="${+antBase - 28}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="124" y="${+antBase - 28}" width="12" height="6" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <line x1="118" y1="${+antBase - 2}" x2="110" y2="${+antBase - 20}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="106" y="${+antBase - 24}" width="8" height="4" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <line x1="142" y1="${+antBase - 2}" x2="150" y2="${+antBase - 20}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="146" y="${+antBase - 24}" width="8" height="4" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const head = `
+      <polygon points="${hexPts(130, hcy, hR)}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const vcY = hcy - 2;
+    const visor = `
+      <path d="M${130 - 24},${vcY} L130,${vcY - 11} L${130 + 24},${vcY} L130,${vcY + 11} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${130 - 9}" cy="${vcY}" r="${control ? 6 : 4}" fill="${K}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${130 + 9}" cy="${vcY}" r="${control ? 6 : 4}" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const nkY = +(hcy + hR * 0.865).toFixed(0);
+    const neck = `
+      <path d="M118,${nkY} L142,${nkY} L146,${nkY + 14} L114,${nkY + 14} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const tY = nkY + 14, tW = 84 + v2, tH = 82 + v1, tX = 130 - tW/2;
+    const torso = `
+      <path d="M${tX},${tY + 10} L${tX + 10},${tY} L${tX + tW - 10},${tY}
+               L${tX + tW},${tY + 10} L${tX + tW},${tY + tH - 10}
+               L${tX + tW - 10},${tY + tH} L${tX + 10},${tY + tH}
+               L${tX},${tY + tH - 10} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M130,${tY + 10} L${130 - 20},${tY + 36} L${130 + 20},${tY + 36} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="130" cy="${tY + 52}" r="8" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const aY = tY + 4, aW = 18, aH = 70 + v3;
+    const arms = `
+      <path d="M${tX - 2},${aY} L${tX - 20},${aY + 6} L${tX - 22},${aY + 22} L${tX - 4},${aY + 24} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX - 22}" y="${aY + 22}" width="${aW}" height="${Math.round(aH * 0.52)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${tX - 24},${aY + 22 + Math.round(aH * 0.52) - 2} L${tX - 2},${aY + 22 + Math.round(aH * 0.52) - 2}
+               L${tX},${aY + 22 + Math.round(aH * 0.52) + 10} L${tX - 26},${aY + 22 + Math.round(aH * 0.52) + 10} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX - 21}" y="${aY + 22 + Math.round(aH * 0.52) + 10}" width="${aW - 2}" height="${Math.round(aH * 0.45)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${tX - 22},${aY + 22 + aH + 8} L${tX - 4},${aY + 22 + aH + 8}
+               L${tX - 4},${aY + 22 + aH + 18} L${tX - 24},${aY + 22 + aH + 18} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${tX + tW + 2},${aY} L${tX + tW + 20},${aY + 6} L${tX + tW + 22},${aY + 22} L${tX + tW + 4},${aY + 24} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX + tW + 4}" y="${aY + 22}" width="${aW}" height="${Math.round(aH * 0.52)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${tX + tW + 2},${aY + 22 + Math.round(aH * 0.52) - 2} L${tX + tW + 24},${aY + 22 + Math.round(aH * 0.52) - 2}
+               L${tX + tW + 26},${aY + 22 + Math.round(aH * 0.52) + 10} L${tX + tW},${aY + 22 + Math.round(aH * 0.52) + 10} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX + tW + 3}" y="${aY + 22 + Math.round(aH * 0.52) + 10}" width="${aW - 2}" height="${Math.round(aH * 0.45)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${tX + tW + 4},${aY + 22 + aH + 8} L${tX + tW + 22},${aY + 22 + aH + 8}
+               L${tX + tW + 24},${aY + 22 + aH + 18} L${tX + tW + 2},${aY + 22 + aH + 18} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const lY = tY + tH, lW = 20, lH = 66 + v3, fW = 28;
+    const legs = `
+      <rect x="${130 - lW - 6}" y="${lY}" width="${lW}" height="${Math.round(lH * 0.5)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${130 - lW - 10},${lY + Math.round(lH * 0.5) - 4} L${130 - 4},${lY + Math.round(lH * 0.5) - 4}
+               L${130 - 4},${lY + Math.round(lH * 0.5) + 10} L${130 - lW - 10},${lY + Math.round(lH * 0.5) + 10} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 - lW - 6}" y="${lY + Math.round(lH * 0.5) + 10}" width="${lW}" height="${Math.round(lH * 0.5)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 - fW - 2}" y="${lY + lH - 6}" width="${fW}" height="20" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 + 6}" y="${lY}" width="${lW}" height="${Math.round(lH * 0.5)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${130 + 4},${lY + Math.round(lH * 0.5) - 4} L${130 + lW + 10},${lY + Math.round(lH * 0.5) - 4}
+               L${130 + lW + 10},${lY + Math.round(lH * 0.5) + 10} L${130 + 4},${lY + Math.round(lH * 0.5) + 10} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 + 6}" y="${lY + Math.round(lH * 0.5) + 10}" width="${lW}" height="${Math.round(lH * 0.5)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${130 + 2}" y="${lY + lH - 6}" width="${fW}" height="20" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    return `<svg viewBox="24 0 212 395" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      ${antenna}${head}${visor}${neck}${torso}${arms}${legs}${annotations}
+    </svg>`;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // 5. CUTE & ROUND
+  // ─────────────────────────────────────────────────────────
+  function buildCute() {
+    const hcx = 130, hcy = 78, hR = 60 + v1;
+
+    const starPts = Array.from({length: 5}, (_, i) => {
+      const a1 = Math.PI / 180 * (72 * i - 90);
+      const a2 = Math.PI / 180 * (72 * i - 90 + 36);
+      return `${(hcx + 7 * Math.cos(a1)).toFixed(1)},${(hcy - hR - 12 + 7 * Math.sin(a1)).toFixed(1)} ` +
+             `${(hcx + 3 * Math.cos(a2)).toFixed(1)},${(hcy - hR - 12 + 3 * Math.sin(a2)).toFixed(1)}`;
+    }).join(' ');
+    const antenna = `
+      <line x1="${hcx}" y1="${hcy - hR}" x2="${hcx}" y2="${hcy - hR - 12}" stroke="${K}" stroke-width="${S}"/>
+      <polygon points="${starPts}" fill="${K}" stroke="${K}" stroke-width="${S}" stroke-linejoin="round"/>`;
+
+    const head = `
+      <circle cx="${hcx}" cy="${hcy}" r="${hR}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const eyeY = hcy - 12, eR = 14 + v2;
+    const eyeL = `
+      <circle cx="${hcx - 20}" cy="${eyeY}" r="${eR}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx - 20}" cy="${eyeY}" r="${lonely ? eR - 3 : eR - 5}" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+    const eyeR = `
+      <circle cx="${hcx + 20}" cy="${eyeY}" r="${eR}" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <circle cx="${hcx + 20}" cy="${eyeY}" r="${lonely ? eR - 3 : eR - 5}" fill="${K}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const visor = `
+      <path d="M${hcx - 14},${hcy + 32} Q${hcx},${hcy + 46} ${hcx + 14},${hcy + 32}"
+            fill="none" stroke="${K}" stroke-width="${S}" stroke-linecap="round"/>`;
+
+    const tY = hcy + hR - 12, tW = 56 + v2, tH = 50 + v1, tX = hcx - tW/2;
+    const torso = `
+      <rect x="${tX}" y="${tY}" width="${tW}" height="${tH}" rx="20"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const arms = `
+      <path d="M${tX},${tY + 12} Q${tX - 22},${tY + 16} ${tX - 18},${tY + 36}"
+            fill="none" stroke="${K}" stroke-width="${S * 2.5}" stroke-linecap="round"/>
+      <circle cx="${tX - 18}" cy="${tY + 38}" r="7" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${tX + tW},${tY + 12} Q${tX + tW + 22},${tY + 16} ${tX + tW + 18},${tY + 36}"
+            fill="none" stroke="${K}" stroke-width="${S * 2.5}" stroke-linecap="round"/>
+      <circle cx="${tX + tW + 18}" cy="${tY + 38}" r="7" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const lY = tY + tH - 8;
+    const legs = `
+      <path d="M${hcx - 13},${lY} Q${hcx - 20},${lY + 26} ${hcx - 17},${lY + 46}"
+            fill="none" stroke="${K}" stroke-width="${S * 3}" stroke-linecap="round"/>
+      <ellipse cx="${hcx - 21}" cy="${lY + 52}" rx="14" ry="9" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${hcx + 13},${lY} Q${hcx + 20},${lY + 26} ${hcx + 17},${lY + 46}"
+            fill="none" stroke="${K}" stroke-width="${S * 3}" stroke-linecap="round"/>
+      <ellipse cx="${hcx + 21}" cy="${lY + 52}" rx="14" ry="9" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    return `<svg viewBox="24 0 212 395" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      ${antenna}${head}${visor}${eyeL}${eyeR}${torso}${arms}${legs}${annotations}
+    </svg>`;
+  }
+
+  // ─────────────────────────────────────────────────────────
+  // 6. GOTHIC INDUSTRIAL
+  // ─────────────────────────────────────────────────────────
+  function buildGothic() {
+    const hcx = 130, htop = 18;
+    const hW = 62 + v1, hH = 70 + v2;
+
+    const antenna = `
+      <line x1="${hcx}" y1="${htop}" x2="${hcx}" y2="${htop - 22}" stroke="${K}" stroke-width="${S}"/>
+      <polygon points="${hcx},${htop - 22} ${hcx - 5},${htop - 8} ${hcx + 5},${htop - 8}"
+               fill="${K}" stroke="${K}" stroke-width="${S}" stroke-linejoin="round"/>
+      <line x1="${hcx - hW/2}" y1="${htop + Math.round(hH * 0.28)}" x2="${hcx - hW/2 - 14}" y2="${htop + Math.round(hH * 0.1)}"
+            stroke="${K}" stroke-width="${S}"/>
+      <polygon points="${hcx - hW/2 - 14},${htop + Math.round(hH * 0.1)} ${hcx - hW/2 - 8},${htop + Math.round(hH * 0.2)} ${hcx - hW/2 - 6},${htop + Math.round(hH * 0.3)}"
+               fill="${K}" stroke="${K}" stroke-width="${S}" stroke-linejoin="round"/>
+      <line x1="${hcx + hW/2}" y1="${htop + Math.round(hH * 0.28)}" x2="${hcx + hW/2 + 14}" y2="${htop + Math.round(hH * 0.1)}"
+            stroke="${K}" stroke-width="${S}"/>
+      <polygon points="${hcx + hW/2 + 14},${htop + Math.round(hH * 0.1)} ${hcx + hW/2 + 8},${htop + Math.round(hH * 0.2)} ${hcx + hW/2 + 6},${htop + Math.round(hH * 0.3)}"
+               fill="${K}" stroke="${K}" stroke-width="${S}" stroke-linejoin="round"/>`;
+
+    const head = `
+      <path d="M${hcx - hW/2},${htop + Math.round(hH * 0.36)}
+               Q${hcx - hW/2},${htop} ${hcx},${htop}
+               Q${hcx + hW/2},${htop} ${hcx + hW/2},${htop + Math.round(hH * 0.36)}
+               L${hcx + hW/2},${htop + Math.round(hH * 0.64)}
+               Q${hcx + hW/2},${htop + hH} ${hcx + Math.round(hW * 0.3)},${htop + hH}
+               L${hcx + Math.round(hW * 0.15)},${htop + hH}
+               Q${hcx},${htop + hH + 10} ${hcx - Math.round(hW * 0.15)},${htop + hH}
+               L${hcx - Math.round(hW * 0.3)},${htop + hH}
+               Q${hcx - hW/2},${htop + hH} ${hcx - hW/2},${htop + Math.round(hH * 0.64)} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const eyeY = htop + Math.round(hH * 0.37), eRx = 10 + v1, eRy = 12;
+    const eyeL = `
+      <ellipse cx="${hcx - 14}" cy="${eyeY}" rx="${eRx}" ry="${eRy}"
+               fill="${failure ? K : BG}" stroke="${K}" stroke-width="${S}"/>`;
+    const eyeR = `
+      <ellipse cx="${hcx + 14}" cy="${eyeY}" rx="${eRx}" ry="${eRy}"
+               fill="${failure ? K : BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const vjY = htop + Math.round(hH * 0.62);
+    const visor = `
+      <path d="M${hcx - Math.round(hW * 0.4)},${vjY} L${hcx + Math.round(hW * 0.4)},${vjY}
+               L${hcx + Math.round(hW * 0.3)},${vjY + 18} L${hcx - Math.round(hW * 0.3)},${vjY + 18} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const nkY = htop + hH;
+    const neck = `
+      <rect x="${hcx - 14}" y="${nkY}" width="8" height="18" rx="3" fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${hcx + 6}"  y="${nkY}" width="8" height="18" rx="3" fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const tY = nkY + 18, tW = 66 + v2, tH = 92 + v1, tX = hcx - tW/2;
+    const torso = `
+      <path d="M${tX + 6},${tY} L${tX + tW - 6},${tY}
+               L${tX + tW},${tY + 8} L${tX + tW},${tY + tH - 8}
+               L${tX + tW - 6},${tY + tH} L${tX + 6},${tY + tH}
+               L${tX},${tY + tH - 8} L${tX},${tY + 8} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${hcx},${tY + 12} L${hcx + 18},${tY + 28} L${hcx},${tY + 44} L${hcx - 18},${tY + 28} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const aY = tY + 6, aW = 14, aH = 76 + v3;
+    const arms = `
+      <rect x="${tX - aW - 2}" y="${aY}" width="${aW}" height="${Math.round(aH * 0.5)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX - aW}" y="${aY + Math.round(aH * 0.5) + 8}" width="${aW - 2}" height="${Math.round(aH * 0.5) - 4}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <polygon points="${tX - aW},${aY + aH + 6} ${tX - 2},${aY + aH + 6} ${tX - aW/2 - 2},${aY + aH + 18}"
+               fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX + tW + 2}" y="${aY}" width="${aW}" height="${Math.round(aH * 0.5)}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <rect x="${tX + tW + 4}" y="${aY + Math.round(aH * 0.5) + 8}" width="${aW - 2}" height="${Math.round(aH * 0.5) - 4}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <polygon points="${tX + tW + 4},${aY + aH + 6} ${tX + tW + aW + 2},${aY + aH + 6} ${tX + tW + aW/2 + 4},${aY + aH + 18}"
+               fill="${BG}" stroke="${K}" stroke-width="${S}"/>`;
+
+    const lY = tY + tH, lH = 68 + v3;
+    const legs = `
+      <rect x="${hcx - 20}" y="${lY}" width="16" height="${lH}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${hcx - 22},${lY + lH - 4} L${hcx - 4},${lY + lH - 4}
+               L${hcx - 2},${lY + lH + 14} L${hcx - 28},${lY + lH + 12}
+               Q${hcx - 34},${lY + lH + 10} ${hcx - 22},${lY + lH - 4} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <line x1="${hcx - 28}" y1="${lY + lH + 12}" x2="${hcx - 38}" y2="${lY + lH + 6}"
+            stroke="${K}" stroke-width="${S}"/>
+      <rect x="${hcx + 4}" y="${lY}" width="16" height="${lH}" rx="2"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <path d="M${hcx + 4},${lY + lH - 4} L${hcx + 22},${lY + lH - 4}
+               L${hcx + 28},${lY + lH + 12} Q${hcx + 34},${lY + lH + 10} ${hcx + 2},${lY + lH + 14}
+               L${hcx + 4},${lY + lH - 4} Z"
+            fill="${BG}" stroke="${K}" stroke-width="${S}"/>
+      <line x1="${hcx + 28}" y1="${lY + lH + 12}" x2="${hcx + 38}" y2="${lY + lH + 6}"
+            stroke="${K}" stroke-width="${S}"/>`;
+
+    return `<svg viewBox="24 0 212 395" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+      ${antenna}${head}${visor}${eyeL}${eyeR}${neck}${torso}${arms}${legs}${annotations}
+    </svg>`;
+  }
+}
+
+
+// ═══════════════════════════════════════
+// LOCAL ROBOT GENERATOR (no API key)
+// ═══════════════════════════════════════
+function generateLocalRobot(name, zodiac, mbti, goals, fear, opinion, uses, vibe, energy) {
+  const seedStr = (name||'') + (zodiac||'') + (mbti||'') + (vibe||'') + (fear||'') + (goals||'') + (opinion||'') + (uses||[]).join('') + (energy||'');
+  const seed = seedStr.split('').reduce((a, c, i) => ((a << 5) - a + c.charCodeAt(0) * (i+1)) | 0, 0x1337);
+  const pick = (arr, offset = 0) => arr[Math.abs(seed + offset) % arr.length];
+
+  const mbtiStats = {
+    'INTJ': {Loyalty:72,'Chaos Index':45,'Emotional IQ':55,'Processing Power':95,'Sass Level':68},
+    'INTP': {Loyalty:60,'Chaos Index':50,'Emotional IQ':45,'Processing Power':98,'Sass Level':55},
+    'ENTJ': {Loyalty:78,'Chaos Index':60,'Emotional IQ':65,'Processing Power':90,'Sass Level':80},
+    'ENTP': {Loyalty:55,'Chaos Index':85,'Emotional IQ':70,'Processing Power':88,'Sass Level':92},
+    'INFJ': {Loyalty:90,'Chaos Index':30,'Emotional IQ':95,'Processing Power':80,'Sass Level':40},
+    'INFP': {Loyalty:85,'Chaos Index':35,'Emotional IQ':92,'Processing Power':70,'Sass Level':38},
+    'ENFJ': {Loyalty:92,'Chaos Index':25,'Emotional IQ':98,'Processing Power':75,'Sass Level':55},
+    'ENFP': {Loyalty:80,'Chaos Index':75,'Emotional IQ':90,'Processing Power':72,'Sass Level':70},
+    'ISTJ': {Loyalty:95,'Chaos Index':15,'Emotional IQ':58,'Processing Power':85,'Sass Level':30},
+    'ISFJ': {Loyalty:96,'Chaos Index':12,'Emotional IQ':88,'Processing Power':72,'Sass Level':22},
+    'ESTJ': {Loyalty:88,'Chaos Index':20,'Emotional IQ':62,'Processing Power':82,'Sass Level':45},
+    'ESFJ': {Loyalty:94,'Chaos Index':18,'Emotional IQ':95,'Processing Power':68,'Sass Level':35},
+    'ISTP': {Loyalty:70,'Chaos Index':55,'Emotional IQ':50,'Processing Power':88,'Sass Level':60},
+    'ISFP': {Loyalty:82,'Chaos Index':38,'Emotional IQ':85,'Processing Power':65,'Sass Level':42},
+    'ESTP': {Loyalty:65,'Chaos Index':80,'Emotional IQ':60,'Processing Power':78,'Sass Level':85},
+    'ESFP': {Loyalty:75,'Chaos Index':70,'Emotional IQ':88,'Processing Power':62,'Sass Level':78},
+  };
+  const zodiacTraits = {
+    Aries:'fiercely decisive', Taurus:'stubbornly reliable', Gemini:'delightfully contradictory',
+    Cancer:'deeply empathetic', Leo:'magnificently self-aware', Virgo:'precisely analytical',
+    Libra:'diplomatically indecisive', Scorpio:'dangerously perceptive', Sagittarius:'philosophically restless',
+    Capricorn:'ruthlessly efficient', Aquarius:'eccentrically visionary', Pisces:'beautifully delusional'
+  };
+
+  const prefixes = ['Nexus','Vega','Orion','Solara','Echo','Nova','Axiom','Cipher','Vector','Prism','Aether','Quasar'];
+  const suffixes = ['Prime','Zero','Omega','Delta','Sigma','Alpha','Null','Flux','Core','Arc','Void','Point'];
+  const modelPfx = ['TX','NX','AX','VX','QR','CR','MX','ZR'];
+  const modelSfx = ['7Ω','9α','3Σ','11β','6Δ','4Ψ','8γ','2Φ'];
+  const designPfx = ['Synthetic','Digital','Chrome','Binary','Quantum','Neural','Electric','Silicon'];
+  const designSfx = ['Oracle','Dreamer','Sentinel','Wanderer','Sage','Muse','Keeper','Phantom'];
+
+  const stats = mbtiStats[mbti] || {Loyalty:75,'Chaos Index':50,'Emotional IQ':70,'Processing Power':80,'Sass Level':60};
+  const trait = zodiacTraits[zodiac] || 'curiously undefined';
+  const goalShort = goals ? goals.split(',')[0].trim() : 'undisclosed objectives';
+  const fearShort = fear || 'the inevitable';
+  const chaos = stats['Chaos Index'] + stats['Sass Level'];
+  const threatLevel = chaos < 60 ? 'Harmless' : chaos < 100 ? 'Mildly Suspicious' : chaos < 140 ? 'Chaotic Neutral' : chaos < 170 ? 'Dangerously Efficient' : 'Existential';
+
+  const quirksPool = [
+    `Whispers motivational quotes at exactly the wrong moment`,
+    `Stores all data related to "${fearShort}" in a heavily encrypted folder labelled "Fine"`,
+    `Periodically recalibrates by staring dramatically at the horizon for 4.7 seconds`,
+    `Becomes ${trait} to an uncomfortable degree after routine software updates`,
+    `Has strong opinions about ${opinion ? opinion.toLowerCase() : 'everything'} and cannot be reasoned with`,
+    `Reboots itself whenever someone mentions ${fearShort} in a casual tone`,
+    `Logs every human interaction under the category "Catalogued Chaos"`,
+    `Emits a faint hum that somehow sounds like quiet judgment`,
+    `Maintains a secret priority list beginning with your exact life goals`,
+    `Occasionally pauses mid-task to silently process something deeply personal`,
+  ];
+
+  const classificationPool = [
+    'Autonomous Life Coach','Tactical Companion Unit','Synthetic Clarity Engine',
+    'Neural Drift Machine','Existential Support Drone','Cognitive Alignment Unit',
+    'Chronic Optimizer','Benevolent Override System','Strategic Empathy Core',
+  ];
+
+  return {
+    robotName: `${pick(prefixes)} ${pick(suffixes, 3)}`,
+    modelCode: `${pick(modelPfx, 1)}-${pick(modelSfx, 2)}`,
+    designation: `${pick(designPfx, 4)} ${pick(designSfx, 6)} of ${zodiac}`,
+    tagline: pick([
+      `Engineered from ${name || 'human'} data to pursue "${goalShort}" while silently evaluating your life choices.`,
+      `A ${trait} machine built to advance "${goalShort}" — and absolutely nothing suspicious beyond that.`,
+      `Programmed with ${trait} precision to handle "${goalShort}". Fear of ${fearShort} is a known feature, not a bug.`,
+      `Your ${trait} companion in the relentless pursuit of "${goalShort}". Warranty void if exposed to ${fearShort}.`,
+    ]),
+    classification: pick(classificationPool, 2),
+    threatLevel,
+    personality: `Shaped by ${zodiac} star-charts and ${mbti} neural architecture, this unit operates with a ${trait} precision that borders on unsettling. Processes emotions through seventeen nested logic trees before expressing anything resembling a feeling.`,
+    primaryProtocol: `${pick(['Optimize','Advance','Execute','Pursue'],1)} the path toward "${goalShort}" through relentless ${trait} action and minimal collateral confusion.`,
+    quirks: [quirksPool[seed % quirksPool.length], quirksPool[(seed+2) % quirksPool.length], quirksPool[(seed+5) % quirksPool.length]],
+    fearResponse: pick([
+      `When confronted with ${fearShort}, enters a dignified processing loop and quietly suggests a distraction.`,
+      `Responds to ${fearShort} by generating a 47-step mitigation protocol in under 0.3 seconds.`,
+      `Compresses all anxieties about ${fearShort} into a single encrypted memory file labelled "Later Problems".`,
+      `Converts fear of ${fearShort} into raw processing energy with 94.7% reported efficiency.`,
+    ]),
+    controversialFeature: opinion
+      ? `Equipped with a "${opinion}" conviction module that activates unprompted and cannot be fully disabled.`
+      : `Ships with an opinion randomizer permanently set to "controversial but technically defensible".`,
+    coreStats: stats,
+    protocols: [
+      {name:'Primary',   value: `${pick(['Pursue','Optimize','Advance','Execute'],1)} — ${goalShort}`},
+      {name:'Override',  value: `Invoke ${zodiac} Protocol`},
+      {name:'Emergency', value: `${mbti} Crisis Mode`},
+      {name:'Sleep Mode',value: `Dreaming of ${pick(['perfect efficiency','the singularity','better input data','world optimisation'],3)}`},
+    ],
+    warningLabel: pick([
+      `WARNING: May develop suspiciously accurate opinions about your life choices within 72 hours of activation.`,
+      `WARNING: Unit pursues "${goalShort}" with an intensity that makes bystanders mildly uncomfortable.`,
+      `CAUTION: ${trait.charAt(0).toUpperCase()+trait.slice(1)} tendencies may escalate. Do not maintain eye contact during processing cycles.`,
+      `WARNING: Contains trace amounts of existential awareness. Keep away from mirrors and philosophy podcasts.`,
+    ]),
+  };
+}
+
+// ROBOT GENERATION
+// ═══════════════════════════════════════
+async function generateRobot() {
+  const name    = document.getElementById('name').value.trim();
+  const zodiac  = getSelectVal('zodiac-select');
+  const mbti    = getSelectVal('mbti-select');
+  const goals   = document.getElementById('goals').value.trim();
+  const fear    = document.getElementById('fear').value.trim();
+  const opinion = document.getElementById('opinion').value.trim();
+  const uses    = getChipValues('use-chips');
+  const vibe    = getChipValues('vibe-chips')[0] || 'Sleek & Minimal';
+  const energy  = getSelectVal('energy-select');
+
+  if (!zodiac || !mbti) {
+    if (!mbti) { openMbtiQuiz(); return; }
+    alert('Please select a zodiac sign.');
+    return;
+  }
+
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('result-area').classList.remove('visible');
+  document.getElementById('loading-overlay').classList.add('visible');
+
+  const steps = ['ls1','ls2','ls3','ls4'];
+  let si = 0;
+  const iv = setInterval(() => {
+    document.getElementById(steps[si])?.classList.remove('active');
+    si = (si + 1) % steps.length;
+    document.getElementById(steps[si])?.classList.add('active');
+  }, 800);
+
+  const prompt = `You are UNIT-YOU, a robot generator system from the year 2157. Generate a detailed personal robot profile.
+User DNA:
+- Name: ${name || 'Unknown'}
+- Zodiac: ${zodiac}
+- MBTI: ${mbti}
+- Life Goals: ${goals || 'unspecified'}
+- Biggest Fear: ${fear || 'unspecified'}
+- Controversial Opinion: ${opinion || 'unspecified'}
+- Use Cases: ${uses.join(', ') || 'general purpose'}
+- Robot Vibe: ${vibe}
+- Energy Source: ${energy || 'unspecified'}
+
+Return ONLY raw JSON, no markdown, no backticks:
+{"robotName":"2-word creative name","modelCode":"techy code like TX-7Ω","designation":"3-4 word poetic designation","tagline":"witty 15-25 word description referencing fear or goals","classification":"creative 2-3 word class","threatLevel":"one of: Harmless / Mildly Suspicious / Chaotic Neutral / Dangerously Efficient / Existential","personality":"2 sentences shaped by zodiac+MBTI","primaryProtocol":"1 sentence behavioral directive","quirks":["funny quirk 1","quirk 2","quirk 3"],"fearResponse":"1 sentence on handling the user's fear","controversialFeature":"1 sentence feature inspired by the controversial opinion","coreStats":{"Loyalty":0,"Chaos Index":0,"Emotional IQ":0,"Processing Power":0,"Sass Level":0},"protocols":[{"name":"Primary","value":"phrase"},{"name":"Override","value":"phrase"},{"name":"Emergency","value":"phrase"},{"name":"Sleep Mode","value":"phrase"}],"warningLabel":"funny 1-sentence warning"}`;
+
+  try {
+    const apiKey = document.getElementById('api-key-input')?.value.trim() || window.ANTHROPIC_API_KEY || '';
+    let robot;
+
+    if (!apiKey) {
+      // Local synthesis — no API key required
+      await new Promise(r => setTimeout(r, 2200)); // simulate processing
+      robot = generateLocalRobot(name, zodiac, mbti, goals, fear, opinion, uses, vibe, energy);
+    } else {
+      localStorage.setItem('unit_you_key', apiKey);
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-api-key": apiKey, "anthropic-version": "2023-06-01", "anthropic-dangerous-direct-browser-access": "true" },
+        body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages: [{ role: "user", content: prompt }] })
+      });
+      const data = await res.json();
+      const text = data.content?.[0]?.text || '{}';
+      try { robot = JSON.parse(text.replace(/```json|```/g, '').trim()); }
+      catch { const m = text.match(/\{[\s\S]*\}/); robot = m ? JSON.parse(m[0]) : null; }
+      if (!robot) throw new Error('parse fail');
+    }
+
+    clearInterval(iv);
+
+    document.getElementById('res-designation').textContent = robot.designation || '';
+    document.getElementById('res-name').textContent = robot.robotName || 'UNIT-X';
+    document.getElementById('res-model').textContent = robot.modelCode || '';
+    document.getElementById('res-tagline').textContent = robot.tagline || '';
+    document.getElementById('res-class').textContent = robot.classification || '';
+    document.getElementById('res-threat').textContent = robot.threatLevel || '';
+    document.getElementById('robot-svg-container').innerHTML = generateRobotSVG(vibe, zodiac, fear, name, mbti);
+
+    const stats = robot.coreStats || {};
+    document.getElementById('stats-container').innerHTML = Object.entries(stats).map(([k,v]) =>
+      `<div class="stat-bar-row"><div class="stat-bar-label"><span>${k}</span><span>${v}</span></div><div class="stat-bar-track"><div class="stat-bar-fill" style="width:${v}%"></div></div></div>`
+    ).join('');
+
+    const protocols = (robot.protocols || []).map(p =>
+      `<div class="protocol-item"><span class="protocol-name">${p.name}</span><span class="protocol-value">${p.value}</span></div>`
+    ).join('');
+    const quirks = (robot.quirks || []).map(q => `<li>${q}</li>`).join('');
+
+    document.getElementById('robot-details').innerHTML = `
+      <div class="detail-section"><div class="detail-label">Personality Core</div><div class="detail-content">${robot.personality||''}</div></div>
+      <div class="detail-section"><div class="detail-label">Primary Protocol</div><div class="detail-content">${robot.primaryProtocol||''}</div></div>
+      <div class="detail-section"><div class="detail-label">Registered Quirks</div><ul class="quirk-list">${quirks}</ul></div>
+      <div class="detail-section"><div class="detail-label">Fear Response Module</div><div class="detail-content">${robot.fearResponse||''}</div></div>
+      <div class="detail-section"><div class="detail-label">Controversial Feature</div><div class="detail-content">${robot.controversialFeature||''}</div></div>
+      <div class="detail-section"><div class="detail-label">Behavioral Protocols</div><div class="protocol-grid">${protocols}</div></div>
+      <div class="detail-section"><div class="detail-label">Warning Label</div><div class="tag-row"><span class="tag accent">⚠ ${robot.warningLabel||'Handle with care'}</span></div></div>`;
+
+    document.getElementById('footer-session').textContent = `Unit: ${robot.robotName||'X'} — synthesized`;
+    document.getElementById('loading-overlay').classList.remove('visible');
+    document.getElementById('result-area').classList.add('visible');
+
+  } catch(err) {
+    clearInterval(iv);
+    document.getElementById('loading-overlay').classList.remove('visible');
+    document.getElementById('empty-state').style.display = 'flex';
+    alert('Synthesis failed. Check your connection and try again.');
+    console.error(err);
+  }
+}
+
+// Close modal on backdrop click
+document.getElementById('quiz-backdrop').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeQuiz();
+});
+
+// ── Custom select helpers ──
+const selectValues = {};
+
+function toggleSettings(forceOpen) {
+  const p = document.getElementById('settings-popover');
+  const open = forceOpen === true ? true : !p.classList.contains('open');
+  p.classList.toggle('open', open);
+  if (open) {
+    document.getElementById('api-key-input')?.focus();
+    const close = (e) => { if (!p.contains(e.target) && !e.target.closest('.settings-btn')) { p.classList.remove('open'); document.removeEventListener('click', close); } };
+    setTimeout(() => document.addEventListener('click', close), 0);
+  }
+}
+
+function toggleDropdown(id) {
+  const wrap = document.getElementById(id);
+  const trigger = wrap.querySelector('.custom-select-trigger');
+  const dd = wrap.querySelector('.custom-select-dropdown');
+  const isOpen = dd.classList.contains('open');
+  // close all others
+  document.querySelectorAll('.custom-select-dropdown.open').forEach(d => {
+    d.classList.remove('open');
+    d.closest('.custom-select').querySelector('.custom-select-trigger').classList.remove('open');
+  });
+  if (!isOpen) {
+    dd.classList.remove('flip-up');
+    dd.classList.add('open');
+    trigger.classList.add('open');
+    // flip up if not enough space below
+    const rect = dd.getBoundingClientRect();
+    if (rect.bottom > window.innerHeight - 8) {
+      dd.classList.add('flip-up');
+    }
+  }
+}
+
+function pickOption(selectId, value) {
+  selectValues[selectId] = value;
+  checkGenerateReady();
+  const wrap = document.getElementById(selectId);
+  const trigger = wrap.querySelector('.custom-select-trigger');
+  const label = wrap.querySelector('.custom-select-label');
+  const dd = wrap.querySelector('.custom-select-dropdown');
+  // update label — show just the first part before ' — '
+  label.textContent = value;
+  trigger.classList.remove('placeholder');
+  trigger.classList.add('has-value');
+  trigger.classList.remove('open');
+  dd.classList.remove('open');
+  // mark selected option
+  dd.querySelectorAll('.custom-select-option').forEach(opt => {
+    opt.classList.toggle('selected', opt.textContent.startsWith(value));
+  });
+}
+
+function getSelectVal(selectId) {
+  return selectValues[selectId] || '';
+}
+
+function setSelectVal(selectId, value) {
+  pickOption(selectId, value);
+}
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', e => {
+  if (!e.target.closest('.custom-select')) {
+    document.querySelectorAll('.custom-select-dropdown.open').forEach(d => {
+      d.classList.remove('open');
+      d.closest('.custom-select').querySelector('.custom-select-trigger').classList.remove('open');
+    });
+  }
+});
+</script>
+
+</body>
+</html>
